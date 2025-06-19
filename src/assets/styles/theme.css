@@ -1,0 +1,22 @@
+:root {
+    --bg: #f3f4f6;
+    --text: #1f2937;
+    --card: #ffffff;
+    --primary: #4a6cf7;
+    --secondary: #14b8a6;
+    --accent: #eab308;
+
+    --font-satoshi: 'Satoshi', sans-serif;
+    --font-telma: 'Telma', cursive;
+
+    --font-size-sm: 14px;
+    --font-size-md: 20px;
+    --font-size-lg: 45px;
+    --radius: 8px;
+}
+
+.dark {
+    --bg: #0b0f19;
+    --text: #e5e7eb;
+    --card: rgba(255, 255, 255, 0.05);
+}

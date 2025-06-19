@@ -1,0 +1,54 @@
+.navbar-container {
+    height: 70px;
+    background-color: var(--card);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.navbar {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.app-name {
+    position: absolute;
+    left: 50%;
+    padding-left: 0;
+    transform: translateX(-50%);
+    font-family: var(--font-telma);
+    font-size: var(--font-size-lg);
+    color: var(--primary);
+}
+
+.toggle-userinfo {
+    position: absolute;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.user {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--primary);
+    cursor: pointer;
+}
+
+.main-content {
+    padding: 1rem;
+    background-color: var(--bg);
+    color: var(--text);
+    min-height: calc(100vh - 70px);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+@media (max-width: 600px) {
+    .app-name {
+        padding-left: 20px;
+        left: 20%;
+    }
+}

@@ -1,0 +1,137 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+}
+
+.login-card {
+    background: var(--card);
+    color: var(--text-light);
+    padding: 2.5rem 2rem;
+    border-radius: 16px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+body.dark .login-card {
+    background: var(--card);
+    color: var(--text-dark);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+}
+
+.login-title {
+    font-family: 'Telma', cursive;
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--primary);
+}
+
+label {
+    font-size: 0.9rem;
+    display: block;
+    margin-bottom: 0.3rem;
+}
+
+input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    background: white;
+    transition: border-color 0.2s;
+}
+
+body.dark input {
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.2);
+    color: var(--text-dark);
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.btn {
+    background: var(--primary);
+    color: white;
+    padding: 0.75rem;
+    border: none;
+    width: 100%;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.btn:hover {
+    background: var(--secondary);
+}
+
+.btn-google {
+    background: white;
+    color: #333;
+    border: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.btn-google img {
+    width: 20px;
+    height: 20px;
+}
+
+body.dark .btn-google {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-dark);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-google:hover {
+    background: #f0f0f0;
+}
+
+body.dark .btn-google:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.divider {
+    text-align: center;
+    margin: 1.2rem 0;
+    color: #888;
+    font-size: 0.9rem;
+}
+
+body.dark .divider {
+    color: #aaa;
+}
+
+.footer {
+    text-align: center;
+    margin-top: 1.2rem;
+    font-size: 0.9rem;
+}
+
+.footer a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}

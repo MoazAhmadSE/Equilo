@@ -1,0 +1,16 @@
+.toggle-theme-btn {
+  padding: 6px 12px;
+  font-size: var(--font-size-sm);
+  font-family: var(--font-satoshi);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius);
+  background-color: transparent;
+  color: var(--primary);
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.toggle-theme-btn:hover {
+  background-color: var(--primary);
+  color: #fff;
+}

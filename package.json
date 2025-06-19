@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "dep:build": "npx depcruise --config .dependency-cruiser.cjs --output-type dot src | dot -T svg -o dependency-graph.svg",
-    "dep:watch": "npx chokidar \"src/**/*.{js,jsx,ts,tsx}\" -c \"npm run dep:build\""
+    "dep:watch": "npx chokidar \"src/**/*.{js,jsx,ts,tsx,cjs}\" -c \"npm run dep:build\""
   },
   "dependencies": {
     "firebase": "^11.9.1",
