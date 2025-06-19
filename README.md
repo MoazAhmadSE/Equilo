@@ -1,12 +1,11 @@
 # 🚀 Equilo
 
-**Equilo** is a modern, high-performance web app bootstrapped with **React + Vite**, styled using **Tailwind CSS** with a custom `tw-` prefix to avoid class conflicts.
+**Equilo** is a modern, high-performance web app bootstrapped with **React + Vite**.
 
 ## 🔧 Tech Stack
 
 - ⚛️ React
 - ⚡ Vite
-- 🎨 Tailwind CSS (`tw-` prefix)
 - 🦺 ESLint (basic config included)
 - ☁️ Ready for deployment on Vercel
 
