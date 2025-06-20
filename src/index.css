@@ -12,3 +12,7 @@
     width: 100%;
     color: var(--text);
 }
+
+::-webkit-scrollbar {
+    display: none;
+}

@@ -1,5 +1,5 @@
-import "../css/pages/Login.css";
-import Input from "../css/components/Input";
+import "../css/pages/Signup.css";
+import Input from "../components/Input";
 import SVGIcons from "../assets/icons/SVGIcons";
 import { Link } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
@@ -21,6 +21,7 @@ const Signup = () => {
     setPassword,
     setConfirmPassword,
     handleSignup,
+    handleGoogleSignup,
   } = useSignup();
 
   const {
@@ -32,11 +33,11 @@ const Signup = () => {
   } = useRecaptcha();
 
   return (
-    <div className="login-container">
+    <div className="signup-container">
       <ToastContainer position="top-right" autoClose={3000} />
-      <h1 className="login-heading">Sign Up</h1>
+      <h1 className="signup-heading">Sign Up</h1>
 
-      <div className="input-group">
+      <div className="signup-input-group">
         <Input
           placeholder="Full Name"
           className="input"
@@ -80,7 +81,7 @@ const Signup = () => {
       </div>
 
       <button
-        className="btn login-btn"
+        className="btn signup-btn"
         disabled={loading}
         onClick={() => handleSignup(isCaptchaValid, getToken, resetCaptcha)}
       >
@@ -93,9 +94,13 @@ const Signup = () => {
         <hr className="hr-line" />
       </div>
 
-      <button className="btn-google">
+      <button
+        className="btn-google"
+        onClick={handleGoogleSignup}
+        disabled={loading}
+      >
         <SVGIcons.google />
-        Sign up with Google
+        {loading ? "Signing in..." : "Sign up with Google"}
       </button>
 
       <div className="signup-footer">

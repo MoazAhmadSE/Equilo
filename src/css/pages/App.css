@@ -3,33 +3,52 @@
     height: 70px;
     background-color: var(--card);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    padding-inline: 30px;
 }
 
 .navbar {
     height: 100%;
     display: flex;
     align-items: center;
-    justify-content: center;
-    position: relative;
+    justify-content: space-between;
+    /* position: relative; */
+}
+
+.note-logo {
+    /* position: absolute; */
+    left: 20px;
+    height: 100%;
+    width: 30%;
+    /* wider space for animation */
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    overflow: visible;
+    /* allow animation overflow */
 }
 
 .app-name {
-    position: absolute;
-    left: 50%;
-    padding-left: 0;
-    transform: translateX(-50%);
+    /* position: absolute; */
+    width: 30%;
+    /* left: 50%; */
+    /* padding-left: 0; */
+    /* transform: translateX(-50%); */
     font-family: var(--font-telma);
     font-weight: 700;
     font-size: var(--font-size-lg);
     color: var(--primary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .toggle-userinfo {
-    position: absolute;
-    right: 20px;
+    /* position: absolute; */
+    width: 30%;
     display: flex;
+    justify-content: end;
     align-items: center;
-    gap: 16px;
+    gap: 24px;
 }
 
 .user {
