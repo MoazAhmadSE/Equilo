@@ -1,12 +1,13 @@
 import "../css/pages/Login.css";
-import Input from "../css/components/Input";
+import Input from "../components/Input";
 import SVGIcons from "../assets/icons/SVGIcons";
 import { Link } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import useSignin from "../../../auth-todo/src/hooks/useSignin";
 import useRecaptcha from "../hooks/useRecaptcha";
 import ReCaptchaBox from "../components/ReCaptchaBox";
+import useLogin from "../hooks/useLogin";
+import CircularLoader from "../components/CircularLoader";
 
 const Login = () => {
   const {
@@ -24,7 +25,8 @@ const Login = () => {
     setIsPasswordEmpty,
     setSignInError,
     handleLogin,
-  } = useSignin();
+    handleGoogleLogin,
+  } = useLogin();
 
   const {
     recaptchaRef,
@@ -89,7 +91,14 @@ const Login = () => {
         disabled={loading}
         onClick={() => handleLogin(isCaptchaValid, getToken, resetCaptcha)}
       >
-        {loading ? "Logging in..." : "Login"}
+        {loading ? (
+          <>
+            "Logging in..."
+            <CircularLoader />
+          </>
+        ) : (
+          "Login"
+        )}
       </button>
 
       <div className="divider-container">
@@ -98,9 +107,13 @@ const Login = () => {
         <hr className="hr-line" />
       </div>
 
-      <button className="btn-google">
+      <button
+        className="btn-google"
+        onClick={handleGoogleLogin}
+        disabled={loading}
+      >
         <SVGIcons.google />
-        Login with Google
+        {loading ? "Loading..." : "Login with Google"}
       </button>
 
       <div className="signup-footer">

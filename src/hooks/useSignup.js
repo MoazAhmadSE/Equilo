@@ -1,8 +1,12 @@
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-// import { EmailPasswordProvider } from "../components/firebaseServices/EmailPasswordProvider";
+import { useState } from "react";
+import { useAuth } from "../context/AuthProvider";
 
 const useSignup = () => {
+  const navigate = useNavigate();
+  const { signupWithEmailPassword, loginWithGoogle } = useAuth(); // ✅ get from context
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,7 +20,7 @@ const useSignup = () => {
     confirmPassword: "",
   });
 
-  const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const validate = () => {
     const newErrors = {
@@ -26,36 +30,27 @@ const useSignup = () => {
       confirmPassword: "",
     };
 
-    // Full Name
     if (name.trim() === "") {
       newErrors.name = "Full name is required";
     }
-
-    // Email
-    else if (email.trim() === "") {
+    if (email.trim() === "") {
       newErrors.email = "Email is required";
     } else if (!emailPattern.test(email)) {
       newErrors.email = "Invalid email format";
     }
-
-    // Password
-    else if (password.trim() === "") {
+    if (password.trim() === "") {
       newErrors.password = "Password is required";
     } else if (password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
     }
-
-    // Confirm Password
-    else if (confirmPassword.trim() === "") {
+    if (confirmPassword.trim() === "") {
       newErrors.confirmPassword = "Please confirm your password";
     } else if (password !== confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
     }
 
     setErrors(newErrors);
-
-    // Check if any error exists
-    return Object.values(newErrors).every((err) => err === "");
+    return Object.values(newErrors).every((e) => e === "");
   };
 
   const handleSignup = async (isCaptchaValid, getToken, resetCaptcha) => {
@@ -69,29 +64,37 @@ const useSignup = () => {
     if (!validate()) return;
 
     if (!isCaptchaValid) {
-      toast.warn("Please complete the Captcha");
+      toast.warn("Please complete the CAPTCHA.");
       return;
     }
 
     const token = await getToken();
     if (!token) {
-      toast.warn("Captcha validation failed");
+      toast.warn("CAPTCHA validation failed.");
       return;
     }
 
     setLoading(true);
     try {
-      await EmailPasswordProvider({
+      await signupWithEmailPassword({
         userName: name,
         userMail: email,
         userPassword: password,
-        setLoading,
       });
+      navigate("/verifyemail");
     } catch (err) {
       toast.error(err.message || "Signup failed");
     } finally {
       setLoading(false);
-      resetCaptcha();
+      resetCaptcha?.();
+    }
+  };
+
+  const handleGoogleSignup = async () => {
+    setLoading(true);
+    const user = await loginWithGoogle();
+    if (user) {
+      navigate("/home");
     }
   };
 
@@ -107,6 +110,7 @@ const useSignup = () => {
     setPassword,
     setConfirmPassword,
     handleSignup,
+    handleGoogleSignup,
   };
 };
 

@@ -1,38 +1,51 @@
-import { useState } from "react";
 import { toast } from "react-toastify";
+import { useState } from "react";
+import { useAuth } from "../context/AuthProvider";
 
-const useSignin = () => {
+const useLogin = () => {
+    const {
+        loginWithEmailPassword,
+        loginWithGoogle,
+        loading,
+        // logoutUser,
+    } = useAuth();
+
     const [userEmail, setUserEmail] = useState("");
     const [userPassword, setUserPassword] = useState("");
     const [isEmpty, setIsEmpty] = useState(false);
     const [isPasswordEmpty, setIsPasswordEmpty] = useState(false);
     const [signinError, setSignInError] = useState(false);
-    const [loading, setLoading] = useState(false);
+    // const [loading, setLoading] = useState(false);
 
-    const handleForgetPassword = (resetPassword) => {
-        if (!userEmail.trim()) {
+    const handleForgetPassword = async (resetPassword) => {
+        const email = userEmail.trim();
+
+        if (!email) {
             toast.error("Please enter your email address.");
             setIsEmpty(true);
             return;
         }
-        resetPassword(userEmail.trim());
+
+        try {
+            await resetPassword(email);
+            toast.success("Password reset link sent.");
+        } catch (error) {
+            toast.error("Failed to send reset link.");
+        }
     };
 
-    const handleLogin = async (
-        isCaptchaValid,
-        getToken,
-        loginWithEmailPassword,
-        // resetCaptcha
-    ) => {
+    const handleLogin = async (isCaptchaValid, getToken) => {
         const email = userEmail.trim();
         const password = userPassword;
 
-        // Validate inputs
+        setIsEmpty(false);
+        setIsPasswordEmpty(false);
+        setSignInError(false);
+
         if (!email) {
             setIsEmpty(true);
             return;
         }
-
         if (!password) {
             setIsPasswordEmpty(true);
             return;
@@ -44,12 +57,12 @@ const useSignin = () => {
             return;
         }
 
-        setLoading(true);
-
+        // setLoading(true);
         try {
             await loginWithEmailPassword(email, password);
         } catch (error) {
             console.error("Login Error:", error);
+
             if (error.code === "auth/too-many-requests") {
                 toast.error("Too many login attempts. Try again later.");
             } else if (error.code === "auth/invalid-credential") {
@@ -58,9 +71,18 @@ const useSignin = () => {
                 toast.error("Login failed. Please try again.");
             }
         } finally {
-            // Optionally reset captcha here
-            // resetCaptcha?.();
-            setLoading(false);
+            // setLoading(false);
+        }
+    };
+
+    const handleGoogleLogin = async () => {
+        // setLoading(true);
+        try {
+            await loginWithGoogle();
+        } catch (error) {
+            toast.error("Google login failed.");
+        } finally {
+            // setLoading(false);
         }
     };
 
@@ -76,10 +98,11 @@ const useSignin = () => {
         setIsEmpty,
         setIsPasswordEmpty,
         setSignInError,
-        setLoading,
+        // setLoading,
         handleForgetPassword,
         handleLogin,
+        handleGoogleLogin,
     };
-}
+};
 
-export default useSignin;
+export default useLogin;

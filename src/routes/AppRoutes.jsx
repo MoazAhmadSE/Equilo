@@ -8,6 +8,7 @@ import PageNotFound from "../pages/PageNotFound";
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 import Dashboard from "../pages/Dashboard";
+import VerifyEmail from "../pages/VerifyEmail";
 
 const AppRoutes = () => {
   return (
@@ -15,6 +16,7 @@ const AppRoutes = () => {
       <Route path="/" element={<App />}>
         <Route index element={<Navigate to="login" replace />} />
         <Route path="signup" element={<Signup />} />
+        <Route path="verifyemail" element={<VerifyEmail />} />
         <Route path="login" element={<Login />} />
 
         <Route path="/equilo/home" element={<Home />}>
@@ -23,10 +25,8 @@ const AppRoutes = () => {
           <Route path="history" element={<History />} />
           <Route path="account" element={<Account />} />
         </Route>
+        <Route path="*" element={<PageNotFound />} />
       </Route>
-
-      {/* Catch all */}
-      <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
 };

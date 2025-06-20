@@ -1,0 +1,64 @@
+/* Container */
+.verify-container {
+    height: 100vh;
+    background-color: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Card */
+.verify-card {
+    background-color: var(--card);
+    color: var(--text);
+    padding: 40px;
+    border-radius: var(--radius);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: min(90%, 400px);
+    text-align: center;
+    font-family: var(--font-satoshi);
+}
+
+/* Heading */
+.verify-heading {
+    font-size: var(--font-size-md);
+    font-weight: 600;
+    color: var(--primary);
+}
+
+/* Message */
+.verify-message {
+    margin: 16px 0;
+    font-size: var(--font-size-sm);
+}
+
+/* Loader Wrapper */
+.verify-loader {
+    margin: 24px 0;
+}
+
+/* Button */
+.verify-button {
+    background-color: var(--primary);
+    color: var(--text);
+    font-weight: bold;
+    padding: 10px 24px;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+    transition: opacity 0.2s ease;
+}
+
+.verify-button:hover {
+    background-color: var(--secondary);
+}
+
+.verify-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.verify-button:hover:not(:disabled) {
+    opacity: 0.9;
+}
