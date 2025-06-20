@@ -1,4 +1,5 @@
 .navbar-container {
+    width: 100%;
     height: 70px;
     background-color: var(--card);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -18,6 +19,7 @@
     padding-left: 0;
     transform: translateX(-50%);
     font-family: var(--font-telma);
+    font-weight: 700;
     font-size: var(--font-size-lg);
     color: var(--primary);
 }
@@ -39,12 +41,13 @@
 }
 
 .main-content {
-    padding: 1rem;
     background-color: var(--bg);
     color: var(--text);
-    min-height: calc(100vh - 70px);
+    height: calc(100vh - 70px);
     transition: background-color 0.3s, color 0.3s;
+    overflow-y: auto;
 }
+
 
 @media (max-width: 600px) {
     .app-name {

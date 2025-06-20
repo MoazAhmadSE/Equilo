@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import ToggleTheme from "../components/ToggleTheme";
 import constants from "../assets/constants/static.json";
-import "../css/App.css";
+import "../css/pages/App.css";
 
 const App = () => {
   return (

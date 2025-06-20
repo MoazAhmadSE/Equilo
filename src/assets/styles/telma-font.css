@@ -1,0 +1,15 @@
+@font-face {
+    font-family: 'Telma';
+    src: url('../fonts/Telma/Telma-Regular.woff2') format('woff2');
+    font-weight: 100 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Telma';
+    font-weight: 600 1000;
+    src: url('../fonts/Telma/Telma-Bold.woff2') format('woff2');
+    font-style: normal;
+    font-display: swap;
+}

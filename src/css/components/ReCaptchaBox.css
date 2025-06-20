@@ -1,0 +1,25 @@
+.recaptcha-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+/* Force the reCAPTCHA to fit parent box and scale on small screens */
+.recaptcha-wrapper > div {
+  transform: scale(1);
+  transform-origin: top center;
+  transition: transform 0.3s ease;
+}
+
+@media (max-width: 400px) {
+  .recaptcha-wrapper > div {
+    transform: scale(0.85);
+  }
+}
+
+@media (max-width: 330px) {
+  .recaptcha-wrapper > div {
+    transform: scale(0.75);
+  }
+}
