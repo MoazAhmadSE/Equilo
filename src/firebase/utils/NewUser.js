@@ -11,11 +11,12 @@ const NewUser = async (user) => {
         const batch = writeBatch(db);
 
         batch.set(userDocRef, {
-            uid: user.uid,
-            name: user.displayName || "New User",
-            email: user.email,
+            userId: user.uid,
+            userName: user.displayName || "New User",
+            userEmail: user.email,
+            userImage: user.photoURL || "",
+            userCreatedAt: serverTimestamp(),
             isOnline: false,
-            createdAt: serverTimestamp(),
         });
 
         const taskDocRef = doc(db, "tasks", user.uid);

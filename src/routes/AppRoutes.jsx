@@ -9,6 +9,7 @@ import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 import Dashboard from "../pages/Dashboard";
 import VerifyEmail from "../pages/VerifyEmail";
+import ResetPassword from "../pages/ResetPassword";
 
 const AppRoutes = () => {
   return (
@@ -18,6 +19,7 @@ const AppRoutes = () => {
         <Route path="signup" element={<Signup />} />
         <Route path="verifyemail" element={<VerifyEmail />} />
         <Route path="login" element={<Login />} />
+        <Route path="resetpassword" element={<ResetPassword />} />
 
         <Route path="/equilo/home" element={<Home />}>
           <Route index element={<Dashboard />} />
