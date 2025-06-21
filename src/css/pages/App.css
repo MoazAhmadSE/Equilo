@@ -11,28 +11,40 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    /* position: relative; */
 }
 
 .note-logo {
-    /* position: absolute; */
     left: 20px;
     height: 100%;
     width: 30%;
-    /* wider space for animation */
     display: flex;
     align-items: center;
     justify-content: start;
-    overflow: visible;
-    /* allow animation overflow */
+}
+
+/* Rotate the SVG logo with a pause */
+.note-logo svg {
+    animation: rotate-logo 4s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+    transform-origin: center;
+}
+
+/* Rotation animation keyframes */
+@keyframes rotate-logo {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    50% {
+        transform: rotate(360deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .app-name {
-    /* position: absolute; */
     width: 30%;
-    /* left: 50%; */
-    /* padding-left: 0; */
-    /* transform: translateX(-50%); */
     font-family: var(--font-telma);
     font-weight: 700;
     font-size: var(--font-size-lg);
@@ -43,7 +55,6 @@
 }
 
 .toggle-userinfo {
-    /* position: absolute; */
     width: 30%;
     display: flex;
     justify-content: end;
@@ -66,7 +77,6 @@
     transition: background-color 0.3s, color 0.3s;
     overflow-y: auto;
 }
-
 
 @media (max-width: 600px) {
     .app-name {

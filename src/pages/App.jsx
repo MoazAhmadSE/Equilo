@@ -3,6 +3,7 @@ import ToggleTheme from "../components/ToggleTheme";
 import constants from "../assets/constants/static.json";
 import "../css/pages/App.css";
 import EquiloNoteLoader from "../components/EquiloNoteLoader";
+import SVGIcons from "../assets/icons/SVGIcons";
 
 const App = () => {
   return (
@@ -10,7 +11,8 @@ const App = () => {
       <header className="navbar-container">
         <div className="navbar">
           <div className="note-logo">
-            <EquiloNoteLoader />
+            {/* <EquiloNoteLoader /> */}
+            <SVGIcons.logo sty />
           </div>
           <div className="app-name">{constants.appName}</div>
           <div className="toggle-userinfo">
