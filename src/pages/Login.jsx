@@ -1,31 +1,30 @@
-import "../css/pages/Login.css";
 import Input from "../components/Input";
 import SVGIcons from "../assets/icons/SVGIcons";
 import { Link } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import useLogin from "../hooks/useLogin";
 import useRecaptcha from "../hooks/useRecaptcha";
 import ReCaptchaBox from "../components/ReCaptchaBox";
-import useLogin from "../hooks/useLogin";
-import CircularLoader from "../components/CircularLoader";
+import { useState } from "react";
+import { useResetPassword } from "../firebase/auth/useResetPassword";
+import "../css/pages/Login.css";
 
 const Login = () => {
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const { resetPassword, error, isSuccess } = useResetPassword();
+
   const {
-    userEmail,
-    userPassword,
-    isEmpty,
-    isInvalidEmail,
-    isPasswordEmpty,
-    signinError,
+    email,
+    password,
+    errors,
     loading,
-    setUserEmail,
-    setUserPassword,
-    setIsEmpty,
-    setIsInvalidEmail,
-    setIsPasswordEmpty,
-    setSignInError,
+    setEmail,
+    setPassword,
     handleLogin,
-    handleGoogleLogin,
+    focusRef,
+    handleGoogleLogin: originalGoogleLogin,
+    handleForgetPassword,
   } = useLogin();
 
   const {
@@ -36,92 +35,119 @@ const Login = () => {
     resetCaptcha,
   } = useRecaptcha();
 
+  const handleGoogleLogin = async () => {
+    setGoogleLoading(true);
+    await originalGoogleLogin();
+    setGoogleLoading(false);
+  };
+
+  const isWorking = loading || googleLoading;
+
   return (
     <div className="login-container">
       <ToastContainer position="top-right" autoClose={3000} />
 
       <h1 className="login-heading">Login</h1>
 
-      <div className="input-group">
-        <Input
-          placeholder="Enter Your Email"
-          className="input"
-          value={userEmail}
-          onChange={(e) => {
-            setUserEmail(e.target.value);
-            setIsEmpty(false);
-            setIsInvalidEmail(false);
-            setSignInError(false);
-          }}
-        />
-        {isEmpty && <div className="error-text">Email is required.</div>}
-        {isInvalidEmail && (
-          <div className="error-text">Invalid email address.</div>
-        )}
-
-        <Input
-          placeholder="Enter Your Password"
-          className="input"
-          type="password"
-          value={userPassword}
-          onChange={(e) => {
-            setUserPassword(e.target.value);
-            setIsPasswordEmpty(false);
-            setSignInError(false);
-          }}
-        />
-        {isPasswordEmpty && (
-          <div className="error-text">Password is required.</div>
-        )}
-
-        {signinError && (
-          <div className="error-text">
-            Invalid credentials. Please try again.
+      {isWorking ? (
+        <div className="login-loader">
+          <div className="logo-wrapper">
+            <div className="logo">
+              <SVGIcons.logo width="50" height="50" />
+            </div>
+            <p className="loader-text">
+              {loading ? "Logging You In..." : "Logging In with Google..."}
+            </p>
           </div>
-        )}
+        </div>
+      ) : (
+        <>
+          <form
+            className="login-input-group"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleLogin(isCaptchaValid, getToken, resetCaptcha);
+            }}
+          >
+            <Input
+              placeholder="Email"
+              className="input"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              ref={(el) => (focusRef.current.userMail = el)}
+              aria-label="Email"
+            />
+            {errors.email && (
+              <div className="login-error-text">{errors.email}</div>
+            )}
 
-        <ReCaptchaBox
-          recaptchaRef={recaptchaRef}
-          setIsCaptchaValid={setIsCaptchaValid}
-        />
-      </div>
+            <Input
+              placeholder="Password"
+              className="input"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              ref={(el) => (focusRef.current.userPassword = el)}
+              aria-label="Password"
+            />
+            {errors.password && (
+              <div className="login-error-text">{errors.password}</div>
+            )}
 
-      <button
-        className="btn login-btn"
-        disabled={loading}
-        onClick={() => handleLogin(isCaptchaValid, getToken, resetCaptcha)}
-      >
-        {loading ? (
-          <>
-            "Logging in..."
-            <CircularLoader />
-          </>
-        ) : (
-          "Login"
-        )}
-      </button>
+            <div
+              className="forgot-password-container"
+              onClick={handleForgetPassword(resetPassword)}
+            >
+              Forgot Password?
+            </div>
 
-      <div className="divider-container">
-        <hr className="hr-line" />
-        <span className="hr-text">OR</span>
-        <hr className="hr-line" />
-      </div>
+            {error && (
+              <div className="reset-message error">Error: Try Again {console.log(error)}</div>
+            )}
+            {isSuccess && (
+              <div className="reset-message success">
+                A password reset email has been sent!
+              </div>
+            )}
 
-      <button
-        className="btn-google"
-        onClick={handleGoogleLogin}
-        disabled={loading}
-      >
-        <SVGIcons.google />
-        {loading ? "Loading..." : "Login with Google"}
-      </button>
+            <ReCaptchaBox
+              recaptchaRef={recaptchaRef}
+              setIsCaptchaValid={setIsCaptchaValid}
+            />
 
-      <div className="signup-footer">
-        <span>Don't have an account?</span>
-        <Link to="/signup" className="signup-link">
-          Sign Up
-        </Link>
-      </div>
+            <button
+              className="btn login-btn"
+              disabled={loading || googleLoading}
+              type="submit"
+            >
+              Login
+            </button>
+          </form>
+
+          <div className="divider-container">
+            <hr className="hr-line" />
+            <span className="hr-text">OR</span>
+            <hr className="hr-line" />
+          </div>
+
+          <button
+            className="btn-google"
+            onClick={handleGoogleLogin}
+            disabled={loading || googleLoading}
+          >
+            <SVGIcons.google />
+            Login with Google
+          </button>
+
+          <div className="login-footer">
+            <span>Don't have an account?</span>
+            <Link to="/signup" className="signup-link">
+              Sign Up
+            </Link>
+          </div>
+        </>
+      )}
     </div>
   );
 };

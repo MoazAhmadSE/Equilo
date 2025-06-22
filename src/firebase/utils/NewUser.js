@@ -19,11 +19,11 @@ const NewUser = async (user) => {
             isOnline: false,
         });
 
-        const taskDocRef = doc(db, "tasks", user.uid);
-        batch.set(taskDocRef, {
-            todo: [],
-            completed: [],
-        });
+        // const taskDocRef = doc(db, "tasks", user.uid);
+        // batch.set(taskDocRef, {
+        //     todo: [],
+        //     completed: [],
+        // });
 
         try {
             await batch.commit();
