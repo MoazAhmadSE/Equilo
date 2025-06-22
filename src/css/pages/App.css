@@ -13,17 +13,18 @@
     justify-content: space-between;
 }
 
-.note-logo {
+.logo {
+    display: none;
     left: 20px;
     height: 100%;
     width: 30%;
-    display: flex;
+    /* display: flex; */
     align-items: center;
     justify-content: start;
 }
 
 /* Rotate the SVG logo with a pause */
-.note-logo svg {
+.logo svg {
     animation: rotate-logo 4s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
     transform-origin: center;
 }
@@ -82,5 +83,96 @@
     .app-name {
         padding-left: 20px;
         left: 20%;
+    }
+}
+
+@media (min-width: 456px) {
+    .logo {
+        display: flex;
+    }
+}
+
+.user-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary);
+}
+
+.user-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.user-status {
+    font-size: 0.8rem;
+    color: var(--primary);
+    margin-left: 4px;
+}
+
+/* Dropdown Panel */
+.user-dropdown {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    min-width: 220px;
+    z-index: 999;
+    padding: 10px 0;
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn 0.25s ease-in-out;
+}
+
+.dropdown-item {
+    padding: 10px 16px;
+    color: var(--text-primary);
+    font-size: 0.88rem;
+    transition: background 0.2s ease;
+    white-space: nowrap;
+    text-align: left;
+}
+
+.dropdown-item:hover {
+    background: var(--hover);
+}
+
+.dropdown-item.bold {
+    font-weight: bold;
+    color: var(--primary);
+}
+
+.dropdown-item.email {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    pointer-events: none;
+}
+
+.dropdown-item.logout {
+    color: #e53935;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }

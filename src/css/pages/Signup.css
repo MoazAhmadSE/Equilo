@@ -153,3 +153,125 @@ body.dark .btn-google:hover {
 .signup-link:hover {
     text-decoration: underline;
 }
+
+.forgot-password-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 4px;
+}
+
+.forgot-password-link {
+    font-size: 0.875rem;
+    color: var(--primary-color, #4a6cf7);
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+}
+
+.forgot-password-link:hover {
+    color: var(--primary-hover-color, #3a58c0);
+    text-decoration: underline;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-wrapper .input {
+    width: 100%;
+    padding-right: 2.5rem;
+    /* leave room for eye icon */
+}
+
+.toggle-password {
+    position: absolute;
+    right: 1rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+/* === Loader Section === */
+.signup-loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.logo-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    animation: float 2.5s ease-in-out infinite;
+}
+
+.loader-text {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--primary);
+    text-align: center;
+    font-family: var(--font-satoshi, sans-serif);
+}
+
+/* === Animations === */
+@keyframes float {
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.logo {
+    /* display: none; */
+    left: 20px;
+    height: 100%;
+    width: 30%;
+    /* display: flex; */
+    align-items: center;
+    justify-content: start;
+}
+
+/* Rotate the SVG logo with a pause */
+.logo svg {
+    animation: rotate-logo 4s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+    transform-origin: center;
+}
+
+/* Rotation animation keyframes */
+@keyframes rotate-logo {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    50% {
+        transform: rotate(360deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}

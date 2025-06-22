@@ -1,17 +1,17 @@
-import { useNavigate } from "react-router-dom";
+import { useRef, useState } from "react";
 import { toast } from "react-toastify";
-import { useState } from "react";
-import { useAuth } from "../context/AuthProvider";
+import { useAuth } from "../context/AuthContext";
 
 const useSignup = () => {
-  const navigate = useNavigate();
-  const { signupWithEmailPassword, loginWithGoogle } = useAuth(); // ✅ get from context
+  const { signupWithEmailPasswordForm, loginWithGoogle } = useAuth();
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [value, setValue] = useState({
+    userName: "",
+    userMail: "",
+    userPassword: "",
+    confirmUserPassword: "",
+    loading: false,
+  });
 
   const [errors, setErrors] = useState({
     name: "",
@@ -20,51 +20,73 @@ const useSignup = () => {
     confirmPassword: "",
   });
 
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const [submitted, setSubmitted] = useState(false);
 
-  const validate = () => {
-    const newErrors = {
-      name: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    };
+  const focusRef = useRef({
+    userName: null,
+    userMail: null,
+    userPassword: null,
+    confirmUserPassword: null,
+  });
 
-    if (name.trim() === "") {
-      newErrors.name = "Full name is required";
-    }
-    if (email.trim() === "") {
-      newErrors.email = "Email is required";
-    } else if (!emailPattern.test(email)) {
-      newErrors.email = "Invalid email format";
-    }
-    if (password.trim() === "") {
-      newErrors.password = "Password is required";
-    } else if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-    }
-    if (confirmPassword.trim() === "") {
-      newErrors.confirmPassword = "Please confirm your password";
-    } else if (password !== confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-    }
+  const focusInput = (field) => {
+    focusRef.current[field]?.focus();
+  };
 
-    setErrors(newErrors);
-    return Object.values(newErrors).every((e) => e === "");
+  const validateName = (name) => {
+    if (!name.trim()) return "Full name is required";
+    return "";
+  };
+
+  const validateEmail = (email) => {
+    if (!email.trim()) return "Email is required";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Invalid email address";
+    return "";
+  };
+
+  const validatePassword = (password) => {
+    if (password.length < 6) return "Password must be at least 6 characters";
+    return "";
+  };
+
+  const validateConfirmPassword = (password, confirm) => {
+    if (password !== confirm) return "Passwords do not match";
+    return "";
   };
 
   const handleSignup = async (isCaptchaValid, getToken, resetCaptcha) => {
-    setErrors({
-      name: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    });
+    setSubmitted(true);
 
-    if (!validate()) return;
+    const nameError = validateName(value.userName);
+    if (nameError) {
+      setErrors({ name: nameError, email: "", password: "", confirmPassword: "" });
+      focusInput("userName");
+      return;
+    }
+
+    const emailError = validateEmail(value.userMail);
+    if (emailError) {
+      setErrors({ name: "", email: emailError, password: "", confirmPassword: "" });
+      focusInput("userMail");
+      return;
+    }
+
+    const passwordError = validatePassword(value.userPassword);
+    if (passwordError) {
+      setErrors({ name: "", email: "", password: passwordError, confirmPassword: "" });
+      focusInput("userPassword");
+      return;
+    }
+
+    const confirmError = validateConfirmPassword(value.userPassword, value.confirmUserPassword);
+    if (confirmError) {
+      setErrors({ name: "", email: "", password: "", confirmPassword: confirmError });
+      focusInput("confirmUserPassword");
+      return;
+    }
 
     if (!isCaptchaValid) {
-      toast.warn("Please complete the CAPTCHA.");
+      toast.warn("Please complete the CAPTCHA");
       return;
     }
 
@@ -74,43 +96,56 @@ const useSignup = () => {
       return;
     }
 
-    setLoading(true);
-    try {
-      await signupWithEmailPassword({
-        userName: name,
-        userMail: email,
-        userPassword: password,
-      });
-      navigate("/verifyemail");
-    } catch (err) {
-      toast.error(err.message || "Signup failed");
-    } finally {
-      setLoading(false);
-      resetCaptcha?.();
-    }
-  };
+    setErrors({ name: "", email: "", password: "", confirmPassword: "" });
+    setValue((prev) => ({ ...prev, loading: true }));
 
-  const handleGoogleSignup = async () => {
-    setLoading(true);
-    const user = await loginWithGoogle();
-    if (user) {
-      navigate("/home");
-    }
+    await signupWithEmailPasswordForm({
+      userName: value.userName,
+      userMail: value.userMail,
+      userPassword: value.userPassword,
+    });
+
+    setValue((prev) => ({ ...prev, loading: false }));
+    resetCaptcha?.();
   };
 
   return {
-    name,
-    email,
-    password,
-    confirmPassword,
-    errors,
-    loading,
-    setName,
-    setEmail,
-    setPassword,
-    setConfirmPassword,
+    name: value.userName,
+    email: value.userMail,
+    password: value.userPassword,
+    confirmPassword: value.confirmUserPassword,
+    errors: {
+      name: submitted ? errors.name : "",
+      email: submitted ? errors.email : "",
+      password: submitted ? errors.password : "",
+      confirmPassword: submitted ? errors.confirmPassword : "",
+    },
+    loading: value.loading,
+    setName: (val) => {
+      setValue((prev) => ({ ...prev, userName: val }));
+      if (submitted) setErrors((prev) => ({ ...prev, name: "" }));
+    },
+    setEmail: (val) => {
+      setValue((prev) => ({ ...prev, userMail: val }));
+      if (submitted) setErrors((prev) => ({ ...prev, email: "" }));
+    },
+    setPassword: (val) => {
+      setValue((prev) => ({ ...prev, userPassword: val }));
+      if (submitted) {
+        setErrors((prev) => ({
+          ...prev,
+          password: "",
+          confirmPassword: "",
+        }));
+      }
+    },
+    setConfirmPassword: (val) => {
+      setValue((prev) => ({ ...prev, confirmUserPassword: val }));
+      if (submitted) setErrors((prev) => ({ ...prev, confirmPassword: "" }));
+    },
     handleSignup,
-    handleGoogleSignup,
+    focusRef,
+    handleGoogleSignup: loginWithGoogle,
   };
 };
 

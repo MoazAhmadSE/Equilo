@@ -1,107 +1,118 @@
+import { useState, useRef } from "react";
 import { toast } from "react-toastify";
-import { useState } from "react";
-import { useAuth } from "../context/AuthProvider";
+import { useAuth } from "../context/AuthContext";
 
 const useLogin = () => {
-    const {
-        loginWithEmailPassword,
-        loginWithGoogle,
-        loading,
-        // logoutUser,
-    } = useAuth();
+    const { loginWithEmailPasswordForm, loginWithGoogle } = useAuth();
 
-    const [userEmail, setUserEmail] = useState("");
-    const [userPassword, setUserPassword] = useState("");
-    const [isEmpty, setIsEmpty] = useState(false);
-    const [isPasswordEmpty, setIsPasswordEmpty] = useState(false);
-    const [signinError, setSignInError] = useState(false);
-    // const [loading, setLoading] = useState(false);
 
-    const handleForgetPassword = async (resetPassword) => {
-        const email = userEmail.trim();
+    const [value, setValue] = useState({
+        userMail: "",
+        userPassword: "",
+        loading: false,
+    });
 
-        if (!email) {
-            toast.error("Please enter your email address.");
-            setIsEmpty(true);
-            return;
-        }
+    const [errors, setErrors] = useState({
+        email: "",
+        password: "",
+    });
 
-        try {
-            await resetPassword(email);
-            toast.success("Password reset link sent.");
-        } catch (error) {
-            toast.error("Failed to send reset link.");
-        }
+    const [submitted, setSubmitted] = useState(false);
+
+    const focusRef = useRef({
+        userMail: null,
+        userPassword: null,
+    });
+
+    const focusInput = (field) => {
+        focusRef.current[field]?.focus();
     };
 
-    const handleLogin = async (isCaptchaValid, getToken) => {
-        const email = userEmail.trim();
-        const password = userPassword;
+    const validateEmail = (email) => {
+        if (!email.trim()) return "Email is required";
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Invalid email format";
+        return "";
+    };
 
-        setIsEmpty(false);
-        setIsPasswordEmpty(false);
-        setSignInError(false);
+    const validatePassword = (password) => {
+        if (!password.trim()) return "Password is required";
+        if (password.length < 6) return "Password must be at least 6 characters";
+        return "";
+    };
 
-        if (!email) {
-            setIsEmpty(true);
+    const handleLogin = async (isCaptchaValid, getToken, resetCaptcha) => {
+        if (!submitted) setSubmitted(true); // only once
+
+        const emailError = validateEmail(value.userMail);
+        const passwordError = validatePassword(value.userPassword);
+
+        if (emailError || passwordError) {
+            setErrors({ email: emailError, password: passwordError });
+            focusInput(emailError ? "userMail" : "userPassword");
             return;
         }
-        if (!password) {
-            setIsPasswordEmpty(true);
+
+        if (!isCaptchaValid) {
+            toast.warn("Please complete the CAPTCHA");
             return;
         }
 
-        const captchaToken = await getToken?.();
-        if (!isCaptchaValid || !captchaToken) {
-            toast.error("Please verify you're not a robot.");
+        const token = await getToken();
+        if (!token) {
+            toast.warn("CAPTCHA validation failed");
             return;
         }
 
-        // setLoading(true);
+        setErrors({ email: "", password: "" });
+        setValue((prev) => ({ ...prev, loading: true }));
+
         try {
-            await loginWithEmailPassword(email, password);
-        } catch (error) {
-            console.error("Login Error:", error);
-
-            if (error.code === "auth/too-many-requests") {
-                toast.error("Too many login attempts. Try again later.");
-            } else if (error.code === "auth/invalid-credential") {
-                setSignInError(true);
-            } else {
-                toast.error("Login failed. Please try again.");
-            }
+            await loginWithEmailPasswordForm(value.userMail, value.userPassword);
+        } catch (err) {
+            console.error(err);
+            toast.error("Login failed. Please try again.");
+            resetCaptcha?.();
         } finally {
-            // setLoading(false);
+            setValue((prev) => ({ ...prev, loading: false }));
         }
     };
 
-    const handleGoogleLogin = async () => {
-        // setLoading(true);
-        try {
-            await loginWithGoogle();
-        } catch (error) {
-            toast.error("Google login failed.");
-        } finally {
-            // setLoading(false);
+
+    const handleForgetPassword = (resetPassword) => () => {
+        setSubmitted(true); // ✅ This line is needed
+
+        const emailError = validateEmail(value.userMail);
+
+        if (emailError) {
+            setErrors({ email: emailError, password: "" });
+            focusInput("userMail");
+            return;
         }
+
+        resetPassword(value.userMail);
     };
+
 
     return {
-        userEmail,
-        userPassword,
-        isEmpty,
-        isPasswordEmpty,
-        signinError,
-        loading,
-        setUserEmail,
-        setUserPassword,
-        setIsEmpty,
-        setIsPasswordEmpty,
-        setSignInError,
-        // setLoading,
-        handleForgetPassword,
+        email: value.userMail,
+        password: value.userPassword,
+        loading: value.loading,
+        errors: {
+            email: submitted ? errors.email : "",
+            password: submitted ? errors.password : "",
+        },
+        setEmail: (val) => {
+            setValue((prev) => ({ ...prev, userMail: val }));
+            if (submitted) setErrors((prev) => ({ ...prev, email: "" }));
+        },
+        setPassword: (val) => {
+            setValue((prev) => ({ ...prev, userPassword: val }));
+            if (submitted) setErrors((prev) => ({ ...prev, password: "" }));
+        },
         handleLogin,
-        handleGoogleLogin,
+        focusRef,
+        handleGoogleLogin: loginWithGoogle,
+        handleForgetPassword
     };
 };
 
