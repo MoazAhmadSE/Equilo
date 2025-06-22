@@ -78,7 +78,9 @@ const Signup = () => {
               className="input"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) =>
+                setEmail(e.target.value.replace(/\s/g, "").toLowerCase())
+              }
               ref={(el) => (focusRef.current.userMail = el)}
               aria-label="Email"
             />
@@ -89,7 +91,7 @@ const Signup = () => {
               className="input"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value.replace(/\s/g, ""))}
               ref={(el) => (focusRef.current.userPassword = el)}
               aria-label="Password"
             />
@@ -102,7 +104,7 @@ const Signup = () => {
               className="input"
               type="password"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={(e) => setConfirmPassword(e.target.value.replace(/\s/g, ""))}
               ref={(el) => (focusRef.current.confirmUserPassword = el)}
               aria-label="Confirm Password"
             />

@@ -6,10 +6,10 @@ const useSignup = () => {
   const { signupWithEmailPasswordForm, loginWithGoogle } = useAuth();
 
   const [value, setValue] = useState({
-    userName: "",
+    userName: "Moaz 00",
     userMail: "",
-    userPassword: "",
-    confirmUserPassword: "",
+    userPassword: "123456",
+    confirmUserPassword: "123456",
     loading: false,
   });
 
@@ -106,7 +106,7 @@ const useSignup = () => {
     });
 
     setValue((prev) => ({ ...prev, loading: false }));
-    resetCaptcha?.();
+    // resetCaptcha?.();
   };
 
   return {

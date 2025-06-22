@@ -10,18 +10,18 @@ import Signup from "../pages/Signup";
 import Dashboard from "../pages/Dashboard";
 import VerifyEmail from "../pages/VerifyEmail";
 import ResetPassword from "../pages/ResetPassword";
+import { FirebaseActionRedirect } from "./root";
 
 const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<App />}>
-        <Route index element={<Navigate to="login" replace />} />
+        <Route index element={<FirebaseActionRedirect />} />
+        <Route path="login" element={<Login />} />
         <Route path="signup" element={<Signup />} />
         <Route path="verifyemail" element={<VerifyEmail />} />
-        <Route path="login" element={<Login />} />
         <Route path="resetpassword" element={<ResetPassword />} />
-
-        <Route path="/equilo/home" element={<Home />}>
+        <Route path="equilo/home" element={<Home />}>
           <Route index element={<Dashboard />} />
           <Route path="group" element={<Group />} />
           <Route path="history" element={<History />} />

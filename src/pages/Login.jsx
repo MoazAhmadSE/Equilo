@@ -64,8 +64,13 @@ const Login = () => {
         <>
           <form
             className="login-input-group"
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
+              const token = await getToken();
+              if (!token) {
+                toast.warn("CAPTCHA validation failed");
+                return;
+              }
               handleLogin(isCaptchaValid, getToken, resetCaptcha);
             }}
           >
@@ -74,7 +79,9 @@ const Login = () => {
               className="input"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) =>
+                setEmail(e.target.value.replace(/\s/g, "").toLowerCase())
+              }
               ref={(el) => (focusRef.current.userMail = el)}
               aria-label="Email"
             />
@@ -87,7 +94,7 @@ const Login = () => {
               className="input"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value.replace(/\s/g, ""))}
               ref={(el) => (focusRef.current.userPassword = el)}
               aria-label="Password"
             />
@@ -103,7 +110,9 @@ const Login = () => {
             </div>
 
             {error && (
-              <div className="reset-message error">Error: Try Again {console.log(error)}</div>
+              <div className="reset-message error">
+                Error: Try Again {console.log(error)}
+              </div>
             )}
             {isSuccess && (
               <div className="reset-message success">
