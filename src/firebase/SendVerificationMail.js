@@ -2,22 +2,17 @@ import { sendEmailVerification } from "firebase/auth";
 
 const SendVerificationMail = async (user) => {
   const actionCodeSettings = {
-    url: `${import.meta.env.VITE_BASE_URL || "http://localhost:5173"}/verifyemail`,
+    // ✅ Firebase will call this after user clicks email link (redirect + mode/oobCode in URL)
+    url: "http://localhost:5173",
     handleCodeInApp: true,
   };
 
   try {
     await sendEmailVerification(user, actionCodeSettings);
-    console.log("Verification email sent.");
-  } catch (err) {
-    console.error("Failed to send verification email:", err);
-    if (err.code === "auth/too-many-requests") {
-      throw new Error("Too many requests. Please wait and try again.");
-    } else {
-      throw new Error("Could not send verification email. Please try again.");
-    }
+  } catch (error) {
+    console.error("Failed to send verification email:", error);
+    throw error;
   }
 };
-
 
 export default SendVerificationMail;

@@ -7,14 +7,29 @@ import { useAuth } from "../context/AuthContext";
 import useUserProfile from "../hooks/useUserProfile";
 import { useState } from "react";
 
+import { getAuth } from "firebase/auth";
 const App = () => {
   const { currentUser, logout } = useAuth();
   const { userData, loading, isOnline } = useUserProfile(currentUser?.uid);
   const [showDropdown, setShowDropdown] = useState(false);
+  console.log(
+    "currentUser",
+    currentUser,
+    "loading",
+    loading,
+    "userData",
+    userData
+  );
 
   const toggleDropdown = (show) => {
     setShowDropdown(show);
   };
+
+  const auth = getAuth();
+  window.auth = auth; // 👈 expose to browser console
+
+  const user = useAuth();
+  console.log("user", user, user.currentUser, user.uid);
 
   return (
     <>
@@ -44,10 +59,17 @@ const App = () => {
 
                 {showDropdown && (
                   <div className="user-dropdown">
-                    <div className="dropdown-item bold">{userData.userName}</div>
-                    <div className="dropdown-item email">{userData.userEmail}</div>
+                    <div className="dropdown-item bold">
+                      {userData.userName}
+                    </div>
+                    <div className="dropdown-item email">
+                      {userData.userEmail}
+                    </div>
                     <hr />
-                    <button className="dropdown-item" onClick={() => alert("Redirect to Change Password Page")}>
+                    <button
+                      className="dropdown-item"
+                      onClick={() => alert("Redirect to Change Password Page")}
+                    >
                       🔐 Change Password
                     </button>
                     <button className="dropdown-item logout" onClick={logout}>
