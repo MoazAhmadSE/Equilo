@@ -1,9 +1,11 @@
+/* ----------------- Navbar ----------------- */
 .navbar-container {
     width: 100%;
     height: 70px;
     background-color: var(--card);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     padding-inline: 30px;
+    border-bottom: 1px solid var(--border);
 }
 
 .navbar {
@@ -15,28 +17,20 @@
 
 .logo {
     display: none;
-    left: 20px;
     height: 100%;
     width: 30%;
-    /* display: flex; */
     align-items: center;
     justify-content: start;
 }
 
-/* Rotate the SVG logo with a pause */
 .logo svg {
     animation: rotate-logo 4s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
     transform-origin: center;
 }
 
-/* Rotation animation keyframes */
 @keyframes rotate-logo {
     0% {
         transform: rotate(0deg);
-    }
-
-    50% {
-        transform: rotate(360deg);
     }
 
     100% {
@@ -63,22 +57,6 @@
     gap: 24px;
 }
 
-.user {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: var(--primary);
-    cursor: pointer;
-}
-
-.main-content {
-    background-color: var(--bg);
-    color: var(--text);
-    height: calc(100vh - 70px);
-    transition: background-color 0.3s, color 0.3s;
-    overflow-y: auto;
-}
-
 @media (max-width: 600px) {
     .app-name {
         padding-left: 20px;
@@ -92,6 +70,7 @@
     }
 }
 
+/* ----------------- Avatar / User Info ----------------- */
 .user-wrapper {
     position: relative;
     display: flex;
@@ -100,27 +79,106 @@
     cursor: pointer;
 }
 
-.user-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid var(--primary);
+.avatar-outer {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.user-name {
-    font-weight: 600;
-    color: var(--text-primary);
-    font-size: 0.9rem;
+.avatar-inner {
+    position: relative;
+    z-index: 2;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* background: var(--card); */
+}
+
+.user-avatar,
+.user-initials {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    font-weight: bold;
+    font-size: 1.2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-initials {
+    font-family: var(--font-telma);
+    color: whitesmoke;
+}
+
+.avatar-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .user-status {
-    font-size: 0.8rem;
-    color: var(--primary);
-    margin-left: 4px;
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 2px #0002;
+    z-index: 3;
 }
 
-/* Dropdown Panel */
+.user-status.online {
+    background: limegreen;
+}
+
+.user-status.offline {
+    background: crimson;
+}
+
+.avatar-rotating-border {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50%;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.avatar-rotating-border.online {
+    border: 3px dashed limegreen;
+    animation: rotate-border 30s linear infinite;
+}
+
+.avatar-rotating-border.offline {
+    border: 3px dashed crimson;
+    animation: rotate-border 30s linear infinite;
+}
+
+@keyframes rotate-border {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* ----------------- User Dropdown ----------------- */
 .user-dropdown {
     position: absolute;
     top: 50px;
@@ -175,4 +233,13 @@
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* ----------------- Main Content ----------------- */
+.main-content {
+    background-color: var(--bg);
+    color: var(--text);
+    height: calc(100vh - 70px);
+    transition: background-color 0.3s, color 0.3s;
+    overflow-y: auto;
 }

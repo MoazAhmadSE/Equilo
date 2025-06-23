@@ -1,9 +1,9 @@
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+// import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { auth, db } from "../../firebase/firebaseConfig";
-import NewUser from "../../firebase/utils/NewUser";
+// import NewUser from "../utils/userHandlers";
 import SendVerificationMail from "../SendVerificationMail";
 
 const useLogin = (setUser, setLoading) => {
@@ -34,14 +34,14 @@ const useLogin = (setUser, setLoading) => {
                 return;
             }
 
-            const userRef = doc(db, "users", currentUser.uid);
-            const userDoc = await getDoc(userRef);
+            // const userRef = doc(db, "users", currentUser.uid);
+            // const userDoc = await getDoc(userRef);
 
-            if (!userDoc.exists()) {
-                await NewUser(currentUser);
-            } else {
-                await updateDoc(userRef, { isOnline: true });
-            }
+            // if (!userDoc.exists()) {
+            //     await NewUser(currentUser);
+            // } else {
+            //     await updateDoc(userRef, { isOnline: true });
+            // }
 
             setUser(currentUser);
             toast.success("Logged in successfully!");

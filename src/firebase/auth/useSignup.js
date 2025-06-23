@@ -1,9 +1,9 @@
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { auth, db } from "../../firebase/firebaseConfig";
-import NewUser from "../../firebase/utils/NewUser";
+import createUserProfile from "../utils/userHandlers";
 import SendVerificationMail from "../../firebase/SendVerificationMail";
 
 const useSignup = (setUser, setLoading) => {
@@ -20,14 +20,16 @@ const useSignup = (setUser, setLoading) => {
             const userDoc = await getDoc(doc(db, "users", currentUser.uid));
 
             if (!userDoc.exists()) {
-                await NewUser(currentUser);
+                await createUserProfile({ ...currentUser });
                 await SendVerificationMail(currentUser);
                 toast.info("Verification email sent. Please check your inbox.");
             } else {
                 toast.info("Account already exists. Please log in.");
             }
 
+            await signOut(auth);
             navigate("/verifyemail");
+
         } catch (error) {
             console.error("Signup Error:", error);
             if (error.code === "auth/email-already-in-use") {
@@ -42,4 +44,5 @@ const useSignup = (setUser, setLoading) => {
         }
     };
 };
+
 export default useSignup;

@@ -3,7 +3,7 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { auth, db } from "../../firebase/firebaseConfig";
-import NewUser from "../../firebase/utils/NewUser";
+import createUserProfile from "../utils/userHandlers";
 
 const useGoogleLogin = (setUser, setLoading) => {
     const navigate = useNavigate();
@@ -19,7 +19,7 @@ const useGoogleLogin = (setUser, setLoading) => {
             const userDoc = await getDoc(userRef);
 
             if (!userDoc.exists()) {
-                await NewUser(currentUser);
+                await createUserProfile(currentUser);
                 toast.success("Google account created!");
             } else {
                 await updateDoc(userRef, { isOnline: true });

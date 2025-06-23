@@ -1,35 +1,41 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import ToggleTheme from "../components/ToggleTheme";
 import constants from "../assets/constants/static.json";
 import "../css/pages/App.css";
 import SVGIcons from "../assets/icons/SVGIcons";
 import { useAuth } from "../context/AuthContext";
 import useUserProfile from "../hooks/useUserProfile";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useStringToColor } from "../hooks/useStringToColor";
+import useFirestoreNetworkManager from "../hooks/useFirestoreNetworkManager";
 
 import { getAuth } from "firebase/auth";
 const App = () => {
-  const { currentUser, logout } = useAuth();
-  const { userData, loading, isOnline } = useUserProfile(currentUser?.uid);
+  const { user, logoutUser } = useAuth();
+  const { userData, loading } = useUserProfile();
   const [showDropdown, setShowDropdown] = useState(false);
-  console.log(
-    "currentUser",
-    currentUser,
-    "loading",
-    loading,
-    "userData",
-    userData
-  );
+  const navigate = useNavigate();
+  console.log("currentUser", user, "loading", loading, "userData", userData);
 
   const toggleDropdown = (show) => {
     setShowDropdown(show);
   };
+  console.log("showDropdown", userData);
+
+  const isOnline = useFirestoreNetworkManager();
 
   const auth = getAuth();
-  window.auth = auth; // 👈 expose to browser console
+  window.auth = auth;
 
-  const user = useAuth();
-  console.log("user", user, user.currentUser, user.uid);
+  const avatarColor = useStringToColor(
+    userData?.userName || userData?.userEmail
+  );
+
+  useEffect(() => {
+    if (user?.emailVerified && !loading) {
+      navigate("/equilo/home", { replace: true });
+    }
+  }, [user, loading, navigate]);
 
   return (
     <>
@@ -43,19 +49,31 @@ const App = () => {
 
           <div className="toggle-userinfo">
             <ToggleTheme />
-            {currentUser && !loading && userData && (
+            {user && !loading && userData && (
               <div
                 className="user-wrapper"
                 onMouseEnter={() => toggleDropdown(true)}
                 onMouseLeave={() => toggleDropdown(false)}
               >
-                <img
-                  src={userData.userImage || "/default-avatar.png"}
-                  alt="Profile"
-                  className="user-avatar"
-                />
-                <span className="user-name">{userData.userName}</span>
-                <span className="user-status">{isOnline ? "🟢" : "🔴"}</span>
+                <div className="avatar-outer">
+                  <div className="avatar-inner">
+                    <div className="user-initials">
+                      <span
+                        className="avatar-content"
+                        style={{ backgroundColor: avatarColor }}
+                      >
+                        {userData.userName
+                          ? userData.userName[0].toUpperCase()
+                          : userData.userEmail?.[0]?.toUpperCase() || "?"}
+                      </span>
+                    </div>
+                  </div>
+                  <div
+                    className={`avatar-rotating-border ${
+                      isOnline ? "online" : "offline"
+                    }`}
+                  ></div>
+                </div>
 
                 {showDropdown && (
                   <div className="user-dropdown">
@@ -72,7 +90,10 @@ const App = () => {
                     >
                       🔐 Change Password
                     </button>
-                    <button className="dropdown-item logout" onClick={logout}>
+                    <button
+                      className="dropdown-item logout"
+                      onClick={logoutUser}
+                    >
                       🚪 Logout
                     </button>
                   </div>
