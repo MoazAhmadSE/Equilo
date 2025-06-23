@@ -275,3 +275,48 @@ body.dark .btn-google:hover {
         transform: rotate(360deg);
     }
 }
+
+
+
+/* === File Input Styling === */
+input[type="file"].input {
+    padding: 0.65rem 1rem;
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+input[type="file"].input::file-selector-button {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    margin-right: 1rem;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+input[type="file"].input::file-selector-button:hover {
+    background-color: var(--secondary);
+}
+
+/* Dark mode */
+body.dark input[type="file"].input {
+    border-color: rgba(255, 255, 255, 0.2);
+    color: var(--text);
+}
+
+body.dark input[type="file"].input::file-selector-button {
+    background-color: var(--primary);
+    color: white;
+}
+
+body.dark input[type="file"].input::file-selector-button:hover {
+    background-color: var(--secondary);
+}

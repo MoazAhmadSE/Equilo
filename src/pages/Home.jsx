@@ -1,35 +1,68 @@
-import { Outlet } from "react-router-dom";
-import useUserProfile from "../hooks/useUserProfile"; // adjust the path if needed
-import { useAuth } from "../context/AuthContext"; // adjust based on your setup
+import { useEffect, useState } from "react";
+import { Link, Outlet } from "react-router-dom";
+import useUserProfile from "../hooks/useUserProfile";
+import { useAuth } from "../context/AuthContext";
+import "../css/pages/Home.css";
+import EquiloNoteLoader from "../components/EquiloNoteLoader";
+import SVGIcons from "../assets/icons/SVGIcons";
+import MakeGroupModal from "../components/MakeGroupModal"; // ✅ keep this
+// ❌ remove: import createGroup from "../firebase/utils/groupHandlers";
 
 const Home = () => {
-  const { currentUser } = useAuth(); // should return Firebase user object
+  const { currentUser } = useAuth();
   const { userData, loading, isOnline } = useUserProfile(currentUser?.uid);
 
+  const [rotatePlus, setRotatePlus] = useState(false);
+  const [showMakeGroupModal, setShowMakeGroupModal] = useState(false);
+
+  const handlePlusClick = () => {
+    setRotatePlus(true);
+    setShowMakeGroupModal(true); // open modal
+    setTimeout(() => setRotatePlus(false), 600);
+  };
+
   return (
-    <div>
-      <h1>Welcome to the Home Page</h1>
+    <div className="home-layout">
+      <aside className="sidebar">
+        <div className="left-bar">
+          <div className="animation">
+            <EquiloNoteLoader />
+          </div>
+          <Link to={"/equilo/home"} className="link">
+            Dashboard
+          </Link>
+          <Link to={"/equilo/home"} className="link">
+            History
+          </Link>
 
-      {loading ? (
-        <p>Loading user data...</p>
-      ) : userData ? (
-        <div style={{ marginBottom: "1rem" }}>
-          <img
-            src={userData.userImage || "/default-avatar.png"}
-            alt="Profile"
-            style={{ width: "50px", height: "50px", borderRadius: "50%" }}
-          />
-          <h2>{userData.userName}</h2>
-          <p>{userData.userEmail}</p>
-          <p>Status: {isOnline ? "🟢 Online" : "🔴 Offline"}</p>
+          <div className="group-container">
+            <div>Groups</div>
+            <div
+              className={`plus-icon-wrapper ${rotatePlus ? "rotate" : ""}`}
+              onClick={handlePlusClick}
+            >
+              <SVGIcons.plus className="plus-icon" />
+            </div>
+          </div>
+          <hr className="group-devider" />
         </div>
-      ) : (
-        <p>User not found</p>
-      )}
+      </aside>
 
-      <div>
+      <MakeGroupModal
+        isOpen={showMakeGroupModal}
+        onClose={() => setShowMakeGroupModal(false)}
+        currentUser={currentUser}
+      />
+
+      <main className="main-content-center">
         <Outlet />
-      </div>
+      </main>
+
+      <aside className="sidebar right-bar">
+        <p className="hint">🔔 Notifications</p>
+        <p className="hint">📊 Stats</p>
+        <p className="hint">💬 Support</p>
+      </aside>
     </div>
   );
 };

@@ -1,0 +1,149 @@
+.home-layout {
+    display: flex;
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-satoshi);
+}
+
+/* Sidebar styles (shared) */
+.sidebar {
+    background: var(--card);
+    padding-top: 30px;
+    padding-inline: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 250px;
+    flex-shrink: 0;
+}
+
+/* Optional: keep for custom tweaks */
+.left-bar {
+    /* background-color: thistle; */
+    height: 90%;
+    display: flex;
+    flex-direction: column;
+    /* gap: 20px; */
+    color: var(--text);
+    font-family: var(--font-telma);
+    font-size: var(--font-size-md);
+}
+
+.animation {
+    /* height: 13%; */
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+.group-devider{
+    border: 1px solid var(--border);
+}
+
+.link {
+    all: unset;
+    display: flex;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+
+.group-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.right-bar {}
+.main-content-center {
+    flex-grow: 1;
+    padding: 40px;
+    overflow-y: auto;
+    min-width: 0;
+}
+
+.user-box {
+    background: var(--card);
+    padding: 20px;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.user-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary);
+    margin-bottom: 10px;
+}
+
+.status {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.status.online {
+    color: green;
+}
+
+.status.offline {
+    color: red;
+}
+
+.hint {
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--border);
+    font-size: 0.9rem;
+    color: var(--text);
+}
+
+@media (max-width: 900px) {
+    .home-layout {
+        flex-direction: column;
+    }
+
+    .left-bar,
+    .right-bar {
+        display: none;
+    }
+
+    .main-content-center {
+        padding: 20px;
+    }
+}
+
+.plus-icon-wrapper {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+}
+
+.plus-icon {
+    width: 24px;
+    height: 24px;
+    stroke: var(--primary);
+}
+
+.rotate {
+    animation: rotate360 0.6s ease-in-out;
+}
+
+@keyframes rotate360 {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    /* 50% {
+        transform: rotate(180deg);
+    } */
+
+    100% {
+        transform: rotate(360deg);
+    }
+}

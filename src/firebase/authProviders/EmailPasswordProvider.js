@@ -5,7 +5,7 @@ import {
 } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../firebaseConfig";
-import NewUser from "../utils/NewUser";
+import createUserProfile from "../utils/userHandlers";
 import SendVerificationMail from "../SendVerificationMail";
 
 const signupWithEmailPassword = async ({ userName, userMail, userPassword }) => {
@@ -21,7 +21,7 @@ const signupWithEmailPassword = async ({ userName, userMail, userPassword }) => 
 
         // If this is a new user
         if (!userDoc.exists()) {
-            await NewUser({ userId: user.uid }); // create user and tasks doc
+            await createUserProfile({ userId: user.uid }); // create user and tasks doc
             await SendVerificationMail(user);
             toast.info("Verification email sent. Please check your inbox.");
         }

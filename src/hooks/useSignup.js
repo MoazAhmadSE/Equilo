@@ -1,8 +1,15 @@
 import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const useSignup = () => {
+
+  const navigate = useNavigate();
+  const redirect = new URLSearchParams(location.search).get("redirect");
+  navigate(redirect || "/equilo/home");
+
+
   const { signupWithEmailPasswordForm, loginWithGoogle } = useAuth();
 
   const [value, setValue] = useState({

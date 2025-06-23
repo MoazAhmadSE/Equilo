@@ -11,6 +11,7 @@ import Dashboard from "../pages/Dashboard";
 import VerifyEmail from "../pages/VerifyEmail";
 import ResetPassword from "../pages/ResetPassword";
 import { FirebaseActionRedirect } from "./root";
+import InvitePage from "../pages/InvitePage";
 
 const AppRoutes = () => {
   return (
@@ -22,6 +23,7 @@ const AppRoutes = () => {
         <Route path="verifyemail" element={<VerifyEmail />} />
         <Route path="resetpassword" element={<ResetPassword />} />
         <Route path="equilo/home" element={<Home />}>
+          <Route path="invite/:groupId" element={<InvitePage />} />
           <Route index element={<Dashboard />} />
           <Route path="group" element={<Group />} />
           <Route path="history" element={<History />} />

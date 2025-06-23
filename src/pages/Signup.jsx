@@ -104,7 +104,9 @@ const Signup = () => {
               className="input"
               type="password"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value.replace(/\s/g, ""))}
+              onChange={(e) =>
+                setConfirmPassword(e.target.value.replace(/\s/g, ""))
+              }
               ref={(el) => (focusRef.current.confirmUserPassword = el)}
               aria-label="Confirm Password"
             />

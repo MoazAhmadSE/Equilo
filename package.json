@@ -12,6 +12,7 @@
     "dep:watch": "npx chokidar \"src/**/*.{js,jsx,ts,tsx,cjs}\" -c \"npm run dep:build\""
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/material": "^7.1.2",
@@ -21,7 +22,8 @@
     "react-dom": "^19.1.0",
     "react-google-recaptcha": "^3.1.0",
     "react-router-dom": "^7.6.2",
-    "react-toastify": "^11.0.5"
+    "react-toastify": "^11.0.5",
+    "string-to-color": "^2.2.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
