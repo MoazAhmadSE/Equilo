@@ -9,7 +9,6 @@ import { useEffect, useState } from "react";
 import { useStringToColor } from "../hooks/useStringToColor";
 import useFirestoreNetworkManager from "../hooks/useFirestoreNetworkManager";
 
-import { getAuth } from "firebase/auth";
 const App = () => {
   const { user, logoutUser } = useAuth();
   const { userData, loading } = useUserProfile();
@@ -24,18 +23,19 @@ const App = () => {
 
   const isOnline = useFirestoreNetworkManager();
 
-  const auth = getAuth();
-  window.auth = auth;
-
   const avatarColor = useStringToColor(
     userData?.userName || userData?.userEmail
   );
 
-  useEffect(() => {
-    if (user?.emailVerified && !loading) {
-      navigate("/equilo/home", { replace: true });
-    }
-  }, [user, loading, navigate]);
+  // useEffect(() => {
+  //   if (loading) return; // Wait for auth check
+
+  //   if (user && user.emailVerified) {
+  //     navigate("/equilo/home", { replace: true });
+  //   } else {
+  //     navigate("/login", { replace: true });
+  //   }
+  // }, [user, loading, navigate]);
 
   return (
     <>

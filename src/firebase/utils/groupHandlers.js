@@ -3,6 +3,12 @@ import {
     collection,
     writeBatch,
     serverTimestamp,
+    query,
+    where,
+    getDocs,
+    updateDoc,
+    arrayRemove,
+    arrayUnion,
 } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 
@@ -44,6 +50,22 @@ const createGroup = async ({ groupName, createdBy, members }) => {
     } catch (error) {
         console.error("❌ Error creating group:", error);
         return null;
+    }
+};
+
+export const replaceEmailWithUidInGroups = async (email, uid) => {
+    const groupsRef = collection(db, "groups");
+    const q = query(groupsRef, where("members", "array-contains", email));
+    const snap = await getDocs(q);
+
+    for (const docSnap of snap.docs) {
+        const groupRef = docSnap.ref;
+        await updateDoc(groupRef, {
+            members: arrayRemove(email),
+        });
+        await updateDoc(groupRef, {
+            members: arrayUnion(uid),
+        });
     }
 };
 

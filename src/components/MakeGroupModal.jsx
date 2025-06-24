@@ -4,6 +4,16 @@ import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
 import sendGroupInviteEmail from "../utils/sendGroupInviteEmail";
 import createGroup from "../firebase/utils/groupHandlers"; // ✅ import helper
+import createNotification from "../firebase/utils/notificationHandlers"; // ✅ import notification handler
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  setDoc,
+  doc,
+} from "firebase/firestore";
+import { db } from "../firebase/firebaseConfig";
 
 const MakeGroupModal = ({ isOpen, onClose }) => {
   const [groupName, setGroupName] = useState("");
@@ -58,25 +68,36 @@ const MakeGroupModal = ({ isOpen, onClose }) => {
     setCreating(true);
 
     try {
-      const memberEmails = members.filter((email) => email.trim() !== "");
-      const uniqueEmails = [...new Set([user.email, ...memberEmails])];
+      // Filter out the creator's email from invites
+      const memberEmails = members
+        .map((email) => email.trim().toLowerCase())
+        .filter((email) => email && email !== user.email.toLowerCase());
+      const uniqueEmails = [...new Set(memberEmails)];
 
-      // Just for validation
-      const missing = uniqueEmails.filter((email) => email.trim() === "");
-      if (missing.length > 0) {
-        toast.error(`❌ Empty emails detected.`);
+      // Validation
+      if (
+        uniqueEmails.length !==
+        members
+          .map((email) => email.trim().toLowerCase())
+          .filter((email) => email && email !== user.email.toLowerCase()).length
+      ) {
+        toast.error(`❌ Duplicate emails detected.`);
         setCreating(false);
         return;
       }
 
-      // Simulate user ID mapping (should come from Firestore in real usage)
-      const userIds = [user.uid]; // Only add self for now
+      if (memberEmails.includes(user.email.toLowerCase())) {
+        toast.error("You cannot invite yourself to your own group.");
+        setCreating(false);
+        return;
+      }
 
-      // ✅ Central group creation
+      const groupMembers = [user.uid, ...uniqueEmails]; // admin UID + invited emails
+
       const groupId = await createGroup({
         groupName: groupName.trim(),
         createdBy: user.uid,
-        members: userIds,
+        members: groupMembers,
       });
 
       if (!groupId) {
@@ -84,17 +105,49 @@ const MakeGroupModal = ({ isOpen, onClose }) => {
         return;
       }
 
-      // ✅ Send invite emails (skip self)
-      for (const email of memberEmails) {
-        if (email !== user.email) {
-          await sendGroupInviteEmail({
-            to_email: email,
-            inviter: user.displayName || user.email,
-            group_name: groupName,
-            invite_link: `http://localhost:5173/invite/${groupId}`,
-          });
+      // Add group to user's userGroups subcollection
+      await setDoc(doc(db, "users", user.uid, "userGroups", groupId), {
+        groupId,
+        groupName: groupName.trim(),
+        joinedAt: new Date(),
+        role: "admin",
+      });
+
+      // ✅ Send invite emails (only to others)
+      for (const email of uniqueEmails) {
+        // Check if user exists in Firestore
+        let invitedUserId = null;
+        const usersRef = collection(db, "users");
+        const q = query(usersRef, where("userEmail", "==", email));
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          invitedUserId = querySnapshot.docs[0].id;
         }
+
+        await sendGroupInviteEmail({
+          to_email: email,
+          inviter: user.displayName || user.email,
+          group_name: groupName,
+          invite_link: `http://localhost:5173/equilo/home/group/join/${groupId}`,
+        });
+
+        // Create a notification for the invited user
+        await createNotification({
+          userId: invitedUserId,
+          email,
+          type: "invite",
+          groupId,
+          message: `You've been invited to join the group "${groupName}"!`,
+          link: `/equilo/home/group/join/${groupId}`,
+        });
       }
+
+      console.log(
+        "Inviting these emails:",
+        uniqueEmails,
+        "Admin email:",
+        user.email
+      );
 
       toast.success("✅ Group created and invites sent!");
       onClose();

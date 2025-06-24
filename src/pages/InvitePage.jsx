@@ -17,10 +17,10 @@ const InvitePage = () => {
 
         if (!userSnap.exists()) {
           // 👤 Firestore record doesn't exist → redirect to signup
-          navigate(`/signup?redirect=/invite/${groupId}`);
+          navigate(`/login`);
         } else {
           // ✅ Already registered user
-          navigate(`/group/join/${groupId}`);
+          navigate(`/equilo/home/equilo/home/group/join/${groupId}`);
         }
       } catch (err) {
         console.error("🔥 Invite check failed:", err);
@@ -30,7 +30,7 @@ const InvitePage = () => {
 
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user) {
-        navigate(`/login?redirect=/invite/${groupId}`);
+        navigate(`/login}`);
       } else {
         checkUserAndRedirect(user);
       }

@@ -1,13 +1,29 @@
 import { createUserWithEmailAndPassword, updateProfile, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
+import { collection, query, where, getDocs, updateDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { auth, db } from "../../firebase/firebaseConfig";
 import createUserProfile from "../utils/userHandlers";
 import SendVerificationMail from "../../firebase/SendVerificationMail";
+import updateNotificationsWithUid from "../../utils/updateNotificationsWithUid";
 
 const useSignup = (setUser, setLoading) => {
     const navigate = useNavigate();
+
+    const assignInvitesToUser = async (user) => {
+        const q = query(
+            collection(db, "invites"),
+            where("toEmail", "==", user.email),
+            where("toUserId", "==", null)
+        );
+        const snap = await getDocs(q);
+        for (const inviteDoc of snap.docs) {
+            await updateDoc(inviteDoc.ref, {
+                toUserId: user.uid,
+            });
+        }
+    };
 
     return async ({ userName, userMail, userPassword }) => {
         setLoading(true);
@@ -23,13 +39,19 @@ const useSignup = (setUser, setLoading) => {
                 await createUserProfile({ ...currentUser });
                 await SendVerificationMail(currentUser);
                 toast.info("Verification email sent. Please check your inbox.");
+
+                // Assign invites to this user (after signup)
+                await assignInvitesToUser(currentUser);
+                await updateNotificationsWithUid(currentUser.email, currentUser.uid);
+
+                // Navigate before sign out to avoid redirect issues
+                navigate("/verifyemail");
+                await signOut(auth);
             } else {
                 toast.info("Account already exists. Please log in.");
+                await signOut(auth);
+                navigate("/login");
             }
-
-            await signOut(auth);
-            navigate("/verifyemail");
-
         } catch (error) {
             console.error("Signup Error:", error);
             if (error.code === "auth/email-already-in-use") {

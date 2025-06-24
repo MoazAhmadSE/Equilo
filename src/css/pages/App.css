@@ -181,9 +181,9 @@
 /* ----------------- User Dropdown ----------------- */
 .user-dropdown {
     position: absolute;
-    top: 50px;
+    top: 45px;
     right: 0;
-    background: var(--card);
+    background-color: var(--card);
     border: 1px solid var(--border);
     border-radius: 10px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);

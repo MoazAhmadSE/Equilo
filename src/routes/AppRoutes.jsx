@@ -10,8 +10,10 @@ import Signup from "../pages/Signup";
 import Dashboard from "../pages/Dashboard";
 import VerifyEmail from "../pages/VerifyEmail";
 import ResetPassword from "../pages/ResetPassword";
-import { FirebaseActionRedirect } from "./root";
+import FirebaseActionRedirect from "./root";
 import InvitePage from "../pages/InvitePage";
+import JoinGroupPage from "../pages/JoinGroupPage";
+import ProtectedRoute from "./ProtectedRoute";
 
 const AppRoutes = () => {
   return (
@@ -22,12 +24,20 @@ const AppRoutes = () => {
         <Route path="signup" element={<Signup />} />
         <Route path="verifyemail" element={<VerifyEmail />} />
         <Route path="resetpassword" element={<ResetPassword />} />
-        <Route path="equilo/home" element={<Home />}>
-          <Route path="invite/:groupId" element={<InvitePage />} />
+        <Route
+          path="equilo/home"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<Dashboard />} />
+          {/* <Route path="invite/:groupId" element={<InvitePage />} /> */}
           <Route path="group" element={<Group />} />
           <Route path="history" element={<History />} />
           <Route path="account" element={<Account />} />
+          <Route path="group/join/:groupId" element={<JoinGroupPage />} />
         </Route>
         <Route path="*" element={<PageNotFound />} />
       </Route>
