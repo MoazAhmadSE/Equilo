@@ -1,0 +1,50 @@
+/* Greeting container */
+.greeting-section {
+    /* padding: 20px; */
+    /* text-align: center; */
+}
+
+/* Greeting headline */
+.greeting-title {
+    font-size: var(--font-size-lg);
+    margin-bottom: 12px;
+}
+
+/* Paragraph styling */
+.greeting-paragraph {
+    font-size: var(--font-size-md);
+    /* color: var(--secondary); */
+}
+
+/* Animation wrapper */
+.decrypted-wrapper {
+    display: inline-block;
+    white-space: pre-wrap;
+    position: relative;
+}
+
+/* Screen reader only */
+.decrypted-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+/* Revealed letter style */
+.revealed {
+    color: var(--primary);
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+/* Encrypted scrambling style */
+.encrypted {
+    color: var(--secondary);
+    opacity: 0.4;
+    font-family: monospace;
+}

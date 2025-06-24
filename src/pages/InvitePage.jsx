@@ -20,7 +20,7 @@ const InvitePage = () => {
           navigate(`/login`);
         } else {
           // ✅ Already registered user
-          navigate(`/equilo/home/equilo/home/group/join/${groupId}`);
+          navigate(`/equilo/home/group/join/${groupId}`); // <-- fixed path
         }
       } catch (err) {
         console.error("🔥 Invite check failed:", err);
@@ -30,7 +30,7 @@ const InvitePage = () => {
 
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user) {
-        navigate(`/login}`);
+        navigate(`/login`);
       } else {
         checkUserAndRedirect(user);
       }

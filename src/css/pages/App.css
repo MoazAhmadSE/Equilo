@@ -178,60 +178,82 @@
     }
 }
 
-/* ----------------- User Dropdown ----------------- */
+/* ----------------- User Dropdown (Updated) ----------------- */
 .user-dropdown {
     position: absolute;
-    top: 45px;
+    top: 54px;
     right: 0;
-    background-color: var(--card);
+    /* background: var(--card); */
+    background-color: rgb(106, 106, 106);
     border: 1px solid var(--border);
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    min-width: 220px;
+    border-radius: var(--radius);
+    min-width: 250px;
     z-index: 999;
     padding: 10px 0;
     display: flex;
     flex-direction: column;
-    animation: fadeIn 0.25s ease-in-out;
+    animation: fadeIn 0.25s ease-out;
+    transition: all 0.2s ease;
 }
 
 .dropdown-item {
-    padding: 10px 16px;
-    color: var(--text-primary);
-    font-size: 0.88rem;
-    transition: background 0.2s ease;
-    white-space: nowrap;
+    padding: 12px 20px;
+    font-size: 0.96rem;
+    font-weight: 500;
+    color: var(--text-primary, #1e293b);
+    background: transparent;
+    border: none;
+    outline: none;
     text-align: left;
+    cursor: pointer;
+    border-radius: 8px;
+    margin: 2px 8px;
+    transition: background 0.2s, color 0.2s;
 }
 
-.dropdown-item:hover {
-    background: var(--hover);
+.dropdown-item:hover:not(.bold):not(.email) {
+    background-color: var(--hover, #f1f5f9);
+    color: var(--primary, #4a6cf7);
 }
 
 .dropdown-item.bold {
-    font-weight: bold;
+    font-weight: 700;
+    font-size: 1.05rem;
     color: var(--primary);
+    cursor: default;
+    margin-bottom: 2px;
+    pointer-events: none;
 }
 
 .dropdown-item.email {
-    font-size: 0.78rem;
-    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: var(--text);
+    cursor: default;
     pointer-events: none;
+    margin-bottom: 4px;
 }
 
 .dropdown-item.logout {
     color: #e53935;
+    font-weight: 600;
 }
+
+.user-dropdown hr {
+    border: 1px solid var(--border);
+    margin: 10px 12px;
+}
+
 
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(-6px);
+        transform: translateY(-8px) scale(0.98);
     }
 
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
     }
 }
 

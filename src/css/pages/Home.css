@@ -9,11 +9,9 @@
 /* Sidebar styles (shared) */
 .sidebar {
     background: var(--card);
-    padding-top: 30px;
-    padding-inline: 30px;
+
     display: flex;
     flex-direction: column;
-    gap: 20px;
     width: 250px;
     flex-shrink: 0;
 }
@@ -21,6 +19,9 @@
 /* Optional: keep for custom tweaks */
 .left-bar {
     /* background-color: thistle; */
+    gap: 20px;
+    padding-top: 30px;
+    padding-inline: 30px;
     height: 90%;
     display: flex;
     flex-direction: column;
@@ -55,7 +56,10 @@
     margin-bottom: 5px;
 }
 
-.right-bar {}
+.right-bar {
+    padding-top: 30px;
+    padding-inline: 10px;
+}
 
 .main-content-center {
     flex-grow: 1;
@@ -199,4 +203,99 @@
 
 .delete-btn:hover {
     color: #c0392b;
+}
+
+.group-list {
+    height: 50%;
+    overflow-y: auto;
+    margin-top: 0.5rem;
+    /* mt-2 */
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    /* space-y-2 */
+}
+
+.group-item {
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.05);
+    /* bg-white/5 */
+    color: white;
+    /* text-white */
+    font-size: 0.875rem;
+    /* text-sm */
+    padding: 0.5rem 0.75rem;
+    /* px-3 py-2 */
+    border-radius: 0.5rem;
+    /* rounded-lg */
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    /* transition duration-200 */
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    /* shadow-sm */
+}
+
+.group-item:hover {
+    background-color: rgba(74, 108, 247, 0.2);
+    /* hover:bg-blue-500/20 */
+}
+
+.notification-list {
+    height: 70%;
+    width: 100%;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.notification-item {
+    background-color: var(--bg);
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border);
+    font-size: var(--font-size-sm);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.2s ease;
+}
+
+.notification-item.read {
+    opacity: 0.6;
+}
+
+.notification-item.unread {
+    font-weight: 500;
+}
+
+.notification-item.clickable {
+    cursor: pointer;
+}
+
+.notification-item.clickable:hover {
+    background-color: rgba(74, 108, 247, 0.2);
+}
+
+.message-text {
+    flex: 1;
+    padding-right: 12px;
+    color: var(--text);
+}
+
+.delete-btn {
+    background: transparent;
+    border: none;
+    color: #ff6961;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+}
+
+.no-notifications {
+    display: flex;
+    justify-content: center;
+    color: var(--text);
+    font-size: var(--font-size-sm);
+    padding-top: 20px;
 }

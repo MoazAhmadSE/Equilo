@@ -1,0 +1,138 @@
+.group-page {
+    padding: 2rem;
+    color: var(--text);
+    max-width: 700px;
+    margin: auto;
+    background-color: var(--card);
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.group-title {
+    font-family: var(--font-telma);
+    font-size: var(--font-size-lg);
+    margin-bottom: 0.5rem;
+}
+
+.group-desc {
+    margin-bottom: 0.75rem;
+    font-style: italic;
+    font-family: var(--font-satoshi);
+    font-size: var(--font-size-sm);
+    /* color: #ccc; */
+}
+
+.group-subtext {
+    margin-bottom: 0.25rem;
+    color: var(--text);
+    font-family: var(--font-satoshi);
+    font-size: calc(var(--font-size-sm) + 3px);
+    /* color: #bbb; */
+}
+
+.group-members {
+    margin-top: 2rem;
+}
+
+.group-members-heading {
+    font-size: calc(var(--font-size-md) + 5px);
+    font-family: var(--font-satoshi);
+    font-weight: 400;
+    margin-bottom: 1rem;
+}
+
+.member-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.member-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background-color: var(--card);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+.member-name {
+    color: var(--text);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+}
+
+.member-email {
+    color: var(--text);
+    font-size: 0.85rem;
+    margin-left: 0.5rem;
+}
+
+.admin-badge {
+    background-color: #4a6cf7;
+    /* color: white; */
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    border-radius: 6px;
+    margin-left: auto;
+}
+
+.blurred {
+    filter: blur(4px);
+    pointer-events: none;
+    user-select: none;
+}
+
+.member-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background-color: rgba(255, 255, 255, 0.07);
+    border-radius: 8px;
+    font-size: 0.95rem;
+}
+
+.blurred {
+    filter: blur(0.8px);
+    pointer-events: none;
+    user-select: none;
+}
+
+.group-actions {
+    display: flex;
+    justify-content: end;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.btn-delete,
+.btn-add {
+    padding: 0.5rem 1rem;
+    font-size: var(--font-size-sm);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-delete {
+    background-color: #ff4d4f;
+    /* color: white; */
+}
+
+.btn-add {
+    background-color: var(--primary);
+    /* color: white; */
+}
+
+.btn-delete:hover {
+    background-color: #e63946;
+}
+
+.btn-add:hover {
+    background-color: var(--secondary);
+}

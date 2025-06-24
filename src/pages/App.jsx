@@ -5,7 +5,7 @@ import "../css/pages/App.css";
 import SVGIcons from "../assets/icons/SVGIcons";
 import { useAuth } from "../context/AuthContext";
 import useUserProfile from "../hooks/useUserProfile";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useStringToColor } from "../hooks/useStringToColor";
 import useFirestoreNetworkManager from "../hooks/useFirestoreNetworkManager";
 
@@ -14,18 +14,25 @@ const App = () => {
   const { userData, loading } = useUserProfile();
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
-  console.log("currentUser", user, "loading", loading, "userData", userData);
-
-  const toggleDropdown = (show) => {
-    setShowDropdown(show);
-  };
-  console.log("showDropdown", userData);
+  const dropdownRef = useRef(null);
 
   const isOnline = useFirestoreNetworkManager();
 
   const avatarColor = useStringToColor(
     userData?.userName || userData?.userEmail
   );
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    if (!showDropdown) return;
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showDropdown]);
 
   // useEffect(() => {
   //   if (loading) return; // Wait for auth check
@@ -52,8 +59,9 @@ const App = () => {
             {user && !loading && userData && (
               <div
                 className="user-wrapper"
-                onMouseEnter={() => toggleDropdown(true)}
-                onMouseLeave={() => toggleDropdown(false)}
+                ref={dropdownRef}
+                onClick={() => setShowDropdown((prev) => !prev)}
+                style={{ position: "relative" }}
               >
                 <div className="avatar-outer">
                   <div className="avatar-inner">
@@ -86,13 +94,19 @@ const App = () => {
                     <hr />
                     <button
                       className="dropdown-item"
-                      onClick={() => alert("Redirect to Change Password Page")}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        alert("Redirect to Change Password Page");
+                      }}
                     >
                       🔐 Change Password
                     </button>
                     <button
                       className="dropdown-item logout"
-                      onClick={logoutUser}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        logoutUser();
+                      }}
                     >
                       🚪 Logout
                     </button>
