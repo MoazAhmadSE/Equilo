@@ -42,6 +42,10 @@ const createGroup = async ({ groupName, createdBy, members }) => {
         groupName,
         joinedAt: serverTimestamp(),
     });
+    batch.update(doc(db, "users", createdBy), {
+        joinedGroupIds: arrayUnion(groupId),
+    });
+
 
     try {
         await batch.commit();

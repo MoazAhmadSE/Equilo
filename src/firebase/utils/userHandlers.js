@@ -17,6 +17,7 @@ const createUserProfile = async (user) => {
             userCreatedAt: serverTimestamp(),
             isOnline: false,
             notificationIds: [], // <-- Add this line
+            joinedGroupIds: [],
         });
 
         try {

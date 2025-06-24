@@ -30,8 +30,8 @@ const useLogin = (setUser, setLoading) => {
                     }
                 }
 
-                await signOut(auth);
                 navigate("/verifyemail");
+                // await signOut(auth);
                 return;
             }
 

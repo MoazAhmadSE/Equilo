@@ -1,39 +1,50 @@
-import { doc, getDoc, writeBatch, serverTimestamp, collection, addDoc } from "firebase/firestore";
+import {
+    doc,
+    updateDoc,
+    addDoc,
+    arrayUnion,
+    serverTimestamp,
+    collection,
+} from "firebase/firestore";
 import { db } from "../firebaseConfig";
 
-// ...existing createUserProfile...
-
-/**
- * Create a notification for a user (by userId or email).
- * @param {Object} notification
- * @param {string|null} notification.userId - UID of the user (null if not registered yet)
- * @param {string} notification.email - Email of the user (for invites)
- * @param {string} notification.type - Type of notification (e.g. "invite")
- * @param {string} [notification.groupId] - Optional group ID
- * @param {string} notification.message - Notification message
- */
 const createNotification = async ({
     userId = null,
-    email,
+    email = null,
     type,
     groupId = null,
     message,
-    link = null, // <-- add this
+    link = null,
 }) => {
+    
     try {
-        await addDoc(collection(db, "notifications"), {
-            userId,
-            email,
+        // Build notification object conditionally
+        const notificationData = {
+            ...(userId && { userId }),
+            ...(email && { email }),
             type,
             groupId,
             message,
-            link, // <-- store link
+            link,
             createdAt: serverTimestamp(),
             read: false,
-        });
-        console.log("✅ Notification created");
+        };
+
+        const notificationRef = await addDoc(collection(db, "notifications"), notificationData);
+
+        console.log("✅ Notification created:", notificationRef.id);
+
+        // Optional: Add notification ID to user profile (only if userId is provided)
+        if (userId) {
+            await updateDoc(doc(db, "users", userId), {
+                notificationIds: arrayUnion(notificationRef.id),
+            });
+        }
+
+        return notificationRef;
     } catch (err) {
         console.error("❌ Error creating notification:", err);
     }
 };
+
 export default createNotification;

@@ -10,12 +10,13 @@ const useUserProfile = () => {
     console.log("user", user, user?.uid);
 
     useEffect(() => {
-        setLoading(true);
         if (!user || !user.uid) {
             setUserData(undefined);
             setLoading(false);
             return;
         }
+
+        setLoading(true); // only set when we have a valid user
 
         const unsub = onSnapshot(doc(db, "users", user.uid), (docSnap) => {
             if (docSnap.exists()) {
@@ -28,6 +29,7 @@ const useUserProfile = () => {
 
         return () => unsub();
     }, [user]);
+
 
     return {
         userData,
