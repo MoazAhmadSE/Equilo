@@ -1,6 +1,6 @@
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 // import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import { auth, db } from "../../firebase/firebaseConfig";
 // import NewUser from "../utils/userHandlers";
@@ -8,6 +8,7 @@ import SendVerificationMail from "../SendVerificationMail";
 
 const useLogin = (setUser, setLoading) => {
     const navigate = useNavigate();
+    const location = useLocation();
 
     return async (email, password) => {
         setLoading(true);
@@ -45,7 +46,8 @@ const useLogin = (setUser, setLoading) => {
 
             setUser(currentUser);
             toast.success("Logged in successfully!");
-            navigate("/equilo/home");
+            const redirect = new URLSearchParams(location.search).get("redirect");
+            navigate(redirect || "/equilo/home");
         } catch (error) {
             console.error("Login Error:", error.code, error.message);
             switch (error.code) {

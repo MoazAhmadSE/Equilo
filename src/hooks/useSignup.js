@@ -1,14 +1,13 @@
 import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const useSignup = () => {
-
   const navigate = useNavigate();
+  const location = useLocation();
+  // Only get redirect param, don't navigate here!
   const redirect = new URLSearchParams(location.search).get("redirect");
-  navigate(redirect || "/equilo/home");
-
 
   const { signupWithEmailPasswordForm, loginWithGoogle } = useAuth();
 
@@ -113,7 +112,13 @@ const useSignup = () => {
     });
 
     setValue((prev) => ({ ...prev, loading: false }));
-    // resetCaptcha?.();
+
+    // // Only navigate after successful signup
+    // if (redirect) {
+    //   navigate(redirect, { replace: true });
+    // } else {
+    //   navigate("/equilo/home", { replace: true });
+    // }
   };
 
   return {

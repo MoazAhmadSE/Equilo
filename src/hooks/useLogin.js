@@ -4,14 +4,10 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 const useLogin = () => {
-
     const navigate = useNavigate();
     const redirect = new URLSearchParams(location.search).get("redirect");
-    navigate(redirect || "/equilo/home");
-
 
     const { loginWithEmailPasswordForm, loginWithGoogle } = useAuth();
-
 
     const [value, setValue] = useState({
         userMail: "",
@@ -75,6 +71,12 @@ const useLogin = () => {
 
         try {
             await loginWithEmailPasswordForm(value.userMail, value.userPassword);
+            // Only navigate after successful login
+            if (redirect) {
+                navigate(redirect, { replace: true });
+            } else {
+                navigate("/equilo/home", { replace: true });
+            }
         } catch (err) {
             console.error(err);
             toast.error("Login failed. Please try again.");
@@ -83,7 +85,6 @@ const useLogin = () => {
             setValue((prev) => ({ ...prev, loading: false }));
         }
     };
-
 
     const handleForgetPassword = (resetPassword) => () => {
         setSubmitted(true); // ✅ This line is needed
@@ -98,7 +99,6 @@ const useLogin = () => {
 
         resetPassword(value.userMail);
     };
-
 
     return {
         email: value.userMail,
@@ -119,7 +119,7 @@ const useLogin = () => {
         handleLogin,
         focusRef,
         handleGoogleLogin: loginWithGoogle,
-        handleForgetPassword
+        handleForgetPassword,
     };
 };
 
