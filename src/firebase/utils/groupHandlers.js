@@ -12,7 +12,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 
-const createGroup = async ({ groupName, createdBy, members }) => {
+const createGroup = async ({ groupName, createdBy, members, description = "" }) => {
     console.log("Creating group with params:", {
         groupName,
         createdBy,
@@ -33,6 +33,7 @@ const createGroup = async ({ groupName, createdBy, members }) => {
         createdBy,
         createdAt: serverTimestamp(),
         members,
+        description, // <-- add this line
     });
 
     // ✅ Only add reference for the current user (createdBy)

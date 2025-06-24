@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "../css/components/MakeGroupModal.css";
+import "../css/components/GroupModal.css";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
 import sendGroupInviteEmail from "../utils/sendGroupInviteEmail";
@@ -98,6 +98,7 @@ const MakeGroupModal = ({ isOpen, onClose }) => {
         groupName: groupName.trim(),
         createdBy: user.uid,
         members: groupMembers,
+        description: description.trim(), // <-- add this line
       });
 
       if (!groupId) {

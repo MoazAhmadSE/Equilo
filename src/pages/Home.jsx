@@ -106,9 +106,25 @@ const Home = () => {
   useEffect(() => {
     if (!user) return;
     const ref = collection(db, "users", user.uid, "userGroups");
-    const unsub = onSnapshot(ref, (snap) => {
-      setUserGroups(snap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+
+    const unsub = onSnapshot(ref, async (snap) => {
+      const groupList = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+      const validGroups = [];
+      for (const group of groupList) {
+        const groupRef = doc(db, "groups", group.groupId);
+        const groupSnap = await getDoc(groupRef);
+        if (groupSnap.exists()) {
+          validGroups.push({
+            ...group,
+            groupName: groupSnap.data().groupName || group.groupName,
+          });
+        }
+      }
+
+      setUserGroups(validGroups);
     });
+
     return () => unsub();
   }, [user]);
 
@@ -136,11 +152,17 @@ const Home = () => {
             </div>
           </div>
           <hr className="group-devider" />
-          <ul>
+          <div className="group-list">
             {userGroups.map((group) => (
-              <li key={group.groupId}>{group.groupName}</li>
+              <div
+                key={group.groupId}
+                className="group-item"
+                onClick={() => navigate(`/equilo/home/group/${group.groupId}`)}
+              >
+                {group.groupName}
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       </aside>
 
@@ -157,9 +179,9 @@ const Home = () => {
       <aside className="sidebar right-bar">
         <p className="hint">🔔 Notifications</p>
         {notifications.length > 0 ? (
-          <ul>
+          <div className="notification-list">
             {notifications.map((n) => (
-              <li
+              <div
                 key={n.id}
                 className={`notification-item ${n.read ? "read" : "unread"} ${
                   n.link ? "clickable" : ""
@@ -171,18 +193,17 @@ const Home = () => {
                   className="delete-btn"
                   onClick={(e) => {
                     e.stopPropagation();
-                    cleanupInviteNotification(n.id, user?.uid); // ✅ Pass notif ID directly
+                    cleanupInviteNotification(n.id, user?.uid); // ✅ use ID
                   }}
                 >
                   ❌
                 </button>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         ) : (
           <div className="no-notifications">No notifications yet.</div>
         )}
-        <p className="hint">💬 Support</p>
       </aside>
     </div>
   );

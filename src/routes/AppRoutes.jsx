@@ -34,7 +34,7 @@ const AppRoutes = () => {
         >
           <Route index element={<Dashboard />} />
           {/* <Route path="invite/:groupId" element={<InvitePage />} /> */}
-          <Route path="group" element={<Group />} />
+          <Route path="group/:groupId" element={<Group />} />
           <Route path="history" element={<History />} />
           <Route path="account" element={<Account />} />
           <Route path="group/join/:groupId" element={<JoinGroupPage />} />
