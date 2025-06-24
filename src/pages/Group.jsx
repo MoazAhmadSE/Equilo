@@ -121,61 +121,70 @@ const Group = () => {
   if (!groupData) return <div className="group-error">Group not found.</div>;
 
   return (
-    <div className="group-page">
-      <h2 className="group-title">{groupData.groupName}</h2>
-      <p className="group-desc">{groupData.description || "No description."}</p>
-      <p className="group-subtext">
-        Created by: <strong>{creatorName}</strong>
-      </p>
-      <p className="group-subtext">
-        Created at:{" "}
-        {groupData.createdAt?.toDate().toLocaleString("en-GB", {
-          dateStyle: "long",
-          timeStyle: "short",
-        })}
-      </p>
+    <>
+      <div className="group-page">
+        <h2 className="group-title">{groupData.groupName}</h2>
+        <p className="group-desc">
+          {groupData.description || "No description."}
+        </p>
+        <p className="group-subtext">
+          Created by: <strong>{creatorName}</strong>
+        </p>
+        <p className="group-subtext">
+          Created at:{" "}
+          {groupData.createdAt?.toDate().toLocaleString("en-GB", {
+            dateStyle: "long",
+            timeStyle: "short",
+          })}
+        </p>
 
-      <div className="group-members">
-        <h3 className="group-members-heading">Members</h3>
-        <ul className="member-list">
-          {resolvedMembers.map((m) => (
-            <li
-              key={m.id}
-              className={`member-item ${!m.isJoined ? "blurred" : ""}`}
-            >
-              <span className="member-name">{m.name}</span>
-              <span className="member-email">({m.email})</span>
-              {m.isAdmin && <span className="admin-badge">Admin</span>}
-            </li>
-          ))}
-        </ul>
+        <div className="group-members">
+          <h3 className="group-members-heading">Members</h3>
+          <ul className="member-list">
+            {resolvedMembers.map((m) => (
+              <li
+                key={m.id}
+                className={`member-item ${!m.isJoined ? "blurred" : ""}`}
+              >
+                <span className="member-name">{m.name}</span>
+                <span className="member-email">({m.email})</span>
+                {m.isAdmin && <span className="admin-badge">Admin</span>}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {user?.uid === groupData.createdBy && (
+          <div className="group-actions mt-4">
+            <button className="btn-delete" onClick={handleDeleteGroup}>
+              🗑️ Delete Group
+            </button>
+            <button className="btn-add" onClick={() => setEditOpen(true)}>
+              ✏️ Edit Group
+            </button>
+          </div>
+        )}
+
+        {editOpen && (
+          <EditGroupModal
+            groupId={groupId}
+            groupData={groupData}
+            isOpen={editOpen}
+            onClose={() => setEditOpen(false)}
+            onRefresh={fetchGroup}
+          />
+        )}
       </div>
 
       {user?.uid === groupData.createdBy && (
-        <div className="group-actions mt-4">
-          <button className="btn-delete" onClick={handleDeleteGroup}>
-            🗑️ Delete Group
-          </button>
-          <button className="btn-add" onClick={() => setEditOpen(true)}>
-            ✏️ Edit Group
-          </button>
-          <button
-            className="btn-add-expense"
-            onClick={() => setExpenseOpen(true)}
-          >
-            ➕ Add Expense
-          </button>
-        </div>
-      )}
-
-      {editOpen && (
-        <EditGroupModal
-          groupId={groupId}
-          groupData={groupData}
-          isOpen={editOpen}
-          onClose={() => setEditOpen(false)}
-          onRefresh={fetchGroup}
-        />
+        // <div className="add-expense-bar">
+        <button
+          className="btn-add-expense full-width"
+          onClick={() => setExpenseOpen(true)}
+        >
+          ➕ Add Expense
+        </button>
+        // </div>
       )}
 
       <AddExpenseModal
@@ -183,8 +192,9 @@ const Group = () => {
         onClose={() => setExpenseOpen(false)}
         groupId={groupId}
         onAdd={handleAddExpense}
+        members={resolvedMembers}
       />
-    </div>
+    </>
   );
 };
 
