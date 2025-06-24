@@ -1,26 +1,24 @@
 import { useEffect, useState } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import {
   collection,
   query,
   where,
   onSnapshot,
-  updateDoc,
   doc,
   getDoc,
 } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
 import { db } from "../firebase/firebaseConfig";
 import useUserProfile from "../hooks/useUserProfile";
 import { useAuth } from "../context/AuthContext";
 import "../css/pages/Home.css";
 import EquiloNoteLoader from "../components/EquiloNoteLoader";
 import SVGIcons from "../assets/icons/SVGIcons";
-import MakeGroupModal from "../components/MakeGroupModal"; // ✅ keep this
-// ❌ remove: import createGroup from "../firebase/utils/groupHandlers";
+import MakeGroupModal from "../components/MakeGroupModal";
+import cleanupInviteNotification from "../firebase/utils/cleanupInviteNotification"; // ✅ import
 
 const Home = () => {
-  const { user } = useAuth(); // <-- FIXED: use 'user' not 'currentUser'
+  const { user } = useAuth();
   const { userData, loading, isOnline } = useUserProfile(user?.uid);
 
   const [rotatePlus, setRotatePlus] = useState(false);
@@ -32,15 +30,12 @@ const Home = () => {
 
   const handlePlusClick = () => {
     setRotatePlus(true);
-    setShowMakeGroupModal(true); // open modal
+    setShowMakeGroupModal(true);
     setTimeout(() => setRotatePlus(false), 600);
   };
 
   useEffect(() => {
     if (!user) return;
-
-    // We'll collect notifications from both queries
-    let notiMap = new Map();
 
     const q1 = query(
       collection(db, "notifications"),
@@ -51,17 +46,26 @@ const Home = () => {
       where("email", "==", user.email)
     );
 
+    const notificationBuffers = { userId: [], email: [] };
+
+    const mergeAndSet = () => {
+      const merged = new Map();
+      [...notificationBuffers.userId, ...notificationBuffers.email].forEach(
+        (doc) => {
+          merged.set(doc.id, { id: doc.id, ...doc.data() });
+        }
+      );
+      setNotifications(Array.from(merged.values()));
+    };
+
     const unsub1 = onSnapshot(q1, (snap) => {
-      snap.docs.forEach((docSnap) => {
-        notiMap.set(docSnap.id, { id: docSnap.id, ...docSnap.data() });
-      });
-      setNotifications(Array.from(notiMap.values()));
+      notificationBuffers.userId = snap.docs;
+      mergeAndSet();
     });
+
     const unsub2 = onSnapshot(q2, (snap) => {
-      snap.docs.forEach((docSnap) => {
-        notiMap.set(docSnap.id, { id: docSnap.id, ...docSnap.data() });
-      });
-      setNotifications(Array.from(notiMap.values()));
+      notificationBuffers.email = snap.docs;
+      mergeAndSet();
     });
 
     return () => {
@@ -70,12 +74,10 @@ const Home = () => {
     };
   }, [user]);
 
-  // Handle notification click
   const handleNotificationClick = (link) => {
     if (link) navigate(link);
   };
 
-  // Group notifications by groupId
   const groupNotifications = {};
   const generalNotifications = [];
 
@@ -94,11 +96,7 @@ const Home = () => {
       const names = {};
       for (const id of ids) {
         const groupDoc = await getDoc(doc(db, "groups", id));
-        if (groupDoc.exists()) {
-          names[id] = groupDoc.data().groupName || id;
-        } else {
-          names[id] = id;
-        }
+        names[id] = groupDoc.exists() ? groupDoc.data().groupName : id;
       }
       setGroupNames(names);
     };
@@ -113,9 +111,6 @@ const Home = () => {
     });
     return () => unsub();
   }, [user]);
-
-  console.log("Fetched notifications:", notifications);
-  console.log("Current user:", user);
 
   return (
     <div className="home-layout">
@@ -171,7 +166,16 @@ const Home = () => {
                 }`}
                 onClick={() => handleNotificationClick(n.link)}
               >
-                {n.message}
+                <span className="message-text">{n.message}</span>
+                <button
+                  className="delete-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    cleanupInviteNotification(n.id, user?.uid); // ✅ Pass notif ID directly
+                  }}
+                >
+                  ❌
+                </button>
               </li>
             ))}
           </ul>

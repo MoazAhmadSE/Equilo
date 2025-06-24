@@ -9,10 +9,10 @@ const ProtectedRoute = ({ children }) => {
 
   // Only protect /equilo/home and its subroutes
   if (
-    location.pathname.startsWith("/equilo/home") &&
-    !user
+    (location.pathname.startsWith("/equilo/home") && !user) ||
+    user?.emailVerified !== true
   ) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/verifyemail" state={{ from: location }} replace />;
   }
 
   return children;
