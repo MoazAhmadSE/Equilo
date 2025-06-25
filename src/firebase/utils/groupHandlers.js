@@ -6,18 +6,22 @@ import {
     query,
     where,
     getDocs,
-    updateDoc,
+    // updateDoc,
     arrayRemove,
     arrayUnion,
 } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 
+/**
+ * Creates a new group with members and links it to the creator user.
+ * @param {Object} param
+ * @param {string} param.groupName - Name of the group
+ * @param {string} param.createdBy - UID of user creating the group
+ * @param {Array<string>} param.members - Array of user IDs/emails in the group
+ * @param {string} [param.description] - Optional description of the group
+ * @returns {string|null} The new group ID or null if failed
+ */
 const createGroup = async ({ groupName, createdBy, members, description = "" }) => {
-    console.log("Creating group with params:", {
-        groupName,
-        createdBy,
-        members,
-    });
     if (!groupName || !createdBy || !Array.isArray(members) || members.length === 0) {
         console.error("❌ Invalid parameters passed to createGroup");
         return null;
@@ -33,20 +37,20 @@ const createGroup = async ({ groupName, createdBy, members, description = "" }) 
         createdBy,
         createdAt: serverTimestamp(),
         members,
-        description, // <-- add this line
+        description,
+        expenseIds: [],
     });
 
-    // ✅ Only add reference for the current user (createdBy)
     const userGroupRef = doc(db, "users", createdBy, "userGroups", groupId);
     batch.set(userGroupRef, {
         groupId,
         groupName,
         joinedAt: serverTimestamp(),
     });
+
     batch.update(doc(db, "users", createdBy), {
         joinedGroupIds: arrayUnion(groupId),
     });
-
 
     try {
         await batch.commit();
@@ -58,19 +62,32 @@ const createGroup = async ({ groupName, createdBy, members, description = "" }) 
     }
 };
 
+/**
+ * Replace email with UID in all groups where that email exists as a member.
+ * @param {string} email - Email to replace
+ * @param {string} uid - User ID to replace email with
+ */
 export const replaceEmailWithUidInGroups = async (email, uid) => {
-    const groupsRef = collection(db, "groups");
-    const q = query(groupsRef, where("members", "array-contains", email));
-    const snap = await getDocs(q);
+    try {
+        const groupsRef = collection(db, "groups");
+        const q = query(groupsRef, where("members", "array-contains", email));
+        const snap = await getDocs(q);
 
-    for (const docSnap of snap.docs) {
-        const groupRef = docSnap.ref;
-        await updateDoc(groupRef, {
-            members: arrayRemove(email),
+        const batch = writeBatch(db);
+        snap.docs.forEach((docSnap) => {
+            const groupRef = docSnap.ref;
+            batch.update(groupRef, {
+                members: arrayRemove(email),
+            });
+            batch.update(groupRef, {
+                members: arrayUnion(uid),
+            });
         });
-        await updateDoc(groupRef, {
-            members: arrayUnion(uid),
-        });
+
+        await batch.commit();
+        console.log(`✅ Replaced email ${email} with UID ${uid} in all groups`);
+    } catch (error) {
+        console.error(`❌ Failed to replace email in groups:`, error);
     }
 };
 
