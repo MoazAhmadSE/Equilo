@@ -1,5 +1,6 @@
 /* AddExpenseModal.css */
 
+/* Modal Styles */
 .modal-backdrop {
     position: fixed;
     top: 0;
@@ -25,6 +26,16 @@
     overflow-y: auto;
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
     animation: slideIn 0.3s ease-out;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Custom Scrollbar */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+.modal-content::-webkit-scrollbar-thumb {
+    background-color: #444;
+    border-radius: 6px;
 }
 
 @keyframes slideIn {
@@ -32,7 +43,6 @@
         transform: scale(0.96) translateY(20px);
         opacity: 0;
     }
-
     to {
         transform: scale(1) translateY(0);
         opacity: 1;
@@ -45,6 +55,7 @@ h3 {
     text-align: center;
 }
 
+/* Input Fields */
 .row-inputs {
     display: flex;
     gap: 1rem;
@@ -61,6 +72,7 @@ h3 {
     color: #fff;
 }
 
+/* Expense Section */
 .expense-section {
     margin-bottom: 2rem;
 }
@@ -86,6 +98,7 @@ h3 {
     border-radius: 12px;
     background-color: #292929;
     transition: background-color 0.2s;
+    position: relative;
 }
 
 .member-row:hover {
@@ -119,6 +132,12 @@ select,
 
 .amount-input {
     width: 100px;
+    transition: background-color 0.3s;
+}
+
+.amount-input.error {
+    background-color: #3a1e1e;
+    border: 1px solid #ff4d4f;
 }
 
 .split-options {
@@ -126,6 +145,18 @@ select,
     gap: 0.5rem;
     flex-wrap: wrap;
     align-items: center;
+    animation: fadeIn 0.2s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .blurred {
@@ -134,6 +165,20 @@ select,
     pointer-events: none;
 }
 
+/* Role Badge */
+.role-badge {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    background-color: #4caf50;
+    color: #fff;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+/* Modal Buttons */
 .modal-actions {
     margin-top: 2rem;
     display: flex;
@@ -149,12 +194,12 @@ select,
     font-size: 0.95rem;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    border: none;
 }
 
 .btn-add {
     background-color: #4caf50;
     color: white;
-    border: none;
 }
 
 .btn-add:hover {
@@ -164,9 +209,169 @@ select,
 .btn-cancel {
     background-color: #f44336;
     color: white;
-    border: none;
 }
 
 .btn-cancel:hover {
     background-color: #d32f2f;
+}
+
+/* Add :focus outlines for accessibility */
+.btn-add:focus,
+.btn-cancel:focus {
+    outline: 2px dashed #4caf50;
+    outline-offset: 2px;
+}
+
+/* Distribution Preview */
+.distribution-preview {
+    background-color: #202020;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    margin-top: 2rem;
+    box-shadow: inset 0 0 4px rgba(255, 255, 255, 0.05);
+}
+
+.distribution-preview h4 {
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-bottom: 1px solid #333;
+    padding-bottom: 0.5rem;
+    color: #ddd;
+}
+
+.distribution-preview ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.distribution-preview li {
+    padding: 0.4rem 0;
+    font-size: 0.95rem;
+    color: #ccc;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px dashed #333;
+    transition: background-color 0.3s;
+}
+
+.distribution-preview li:last-child {
+    border-bottom: none;
+}
+
+.distribution-preview li.self-highlight {
+    background-color: rgba(76, 175, 80, 0.08);
+    border-left: 4px solid #4caf50;
+    padding-left: 0.75rem;
+}
+
+.distribution-preview .note {
+    color: #888;
+    font-style: italic;
+    margin-left: 6px;
+    font-size: 0.85rem;
+}
+
+.distribution-preview+.distribution-preview {
+    margin-top: 2rem;
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+}
+
+.distribution-preview li.settlement {
+    color: #aaffaa;
+    justify-content: flex-start;
+    gap: 0.75rem;
+}
+
+.distribution-preview li.settlement span {
+    color: #ccc;
+    font-weight: 500;
+}
+
+.distribution-preview li.settlement span.payer {
+    color: #f78c6b;
+}
+
+.distribution-preview li.settlement span.receiver {
+    color: #5ecaff;
+}
+
+.distribution-preview li.settlement span.amount {
+    color: #4caf50;
+    font-weight: 600;
+}
+
+/* Export Button */
+.export-button {
+    background-color: #2c2c2c;
+    color: #ccc;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+    cursor: pointer;
+    float: right;
+    transition: background-color 0.2s ease;
+}
+
+.export-button:hover {
+    background-color: #3a3a3a;
+    color: #fff;
+}
+
+/* Tooltip */
+.tooltip {
+    position: relative;
+    cursor: pointer;
+    font-weight: bold;
+    z-index: 10;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 180px;
+    background-color: #111;
+    color: #fff;
+    text-align: left;
+    border-radius: 4px;
+    padding: 8px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -90px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Responsive for mobile */
+@media screen and (max-width: 600px) {
+    .modal-content {
+        padding: 1rem;
+    }
+
+    .row-inputs {
+        flex-direction: column;
+    }
+
+    .member-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .amount-input {
+        width: 100%;
+    }
+
+    .split-options {
+        flex-direction: column;
+    }
 }

@@ -1,5 +1,5 @@
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
 import {
   doc,
   getDoc,
@@ -10,10 +10,15 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
 import { useAuth } from "../context/AuthContext";
-import "../css/pages/Group.css";
+
 import EditGroupModal from "../components/EditGroupModal";
-import deleteGroup from "../firebase/utils/deleteGroup";
 import AddExpenseModal from "../components/AddExpenseModal";
+import ExpenseDetailsModal from "../components/ExpenseDetailsModal";
+import deleteGroup from "../firebase/utils/deleteGroup";
+import GroupDebtsBreakdown from "../components/GroupDebtsBreakdown";
+
+import "../css/pages/Group.css";
+import UserGroupExpenseCharts from "../components/GroupPieChart";
 
 const Group = () => {
   const { groupId } = useParams();
@@ -23,14 +28,11 @@ const Group = () => {
   const [groupData, setGroupData] = useState(null);
   const [creatorName, setCreatorName] = useState("Loading...");
   const [resolvedMembers, setResolvedMembers] = useState([]);
+  const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editOpen, setEditOpen] = useState(false);
   const [expenseOpen, setExpenseOpen] = useState(false);
-
-  const handleAddExpense = (expense) => {
-    console.log("Add expense:", expense);
-    // TODO: Add expense to Firestore here
-  };
+  const [selectedExpense, setSelectedExpense] = useState(null);
 
   const fetchGroup = async () => {
     try {
@@ -43,6 +45,7 @@ const Group = () => {
 
       const group = groupSnap.data();
       setGroupData(group);
+      console.log("🎯 Group data loaded:", group);
 
       if (
         !group.members ||
@@ -59,9 +62,8 @@ const Group = () => {
         creatorSnap.exists() ? creatorSnap.data().userName : group.createdBy
       );
 
-      const members = group.members || [];
-      const uids = members.filter((m) => !m.includes("@"));
-      const emails = members.filter((m) => m.includes("@"));
+      const uids = group.members.filter((m) => !m.includes("@"));
+      const emails = group.members.filter((m) => m.includes("@"));
 
       const usersQuery = query(
         collection(db, "users"),
@@ -93,8 +95,23 @@ const Group = () => {
 
       resolved.sort((a, b) => (b.isAdmin ? 1 : 0) - (a.isAdmin ? 1 : 0));
       setResolvedMembers(resolved);
-    } catch (err) {
-      console.error("Failed to fetch group:", err);
+
+      if (group.expenseIds && group.expenseIds.length > 0) {
+        const expensePromises = group.expenseIds.map((id) =>
+          getDoc(doc(db, "expenses", id))
+        );
+        const expenseSnaps = await Promise.all(expensePromises);
+
+        const expensesData = expenseSnaps
+          .filter((snap) => snap.exists())
+          .map((snap) => ({ id: snap.id, ...snap.data() }));
+
+        setExpenses(expensesData);
+      } else {
+        setExpenses([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch group or expenses:", error);
       navigate("/equilo/home", { replace: true });
     } finally {
       setLoading(false);
@@ -105,6 +122,10 @@ const Group = () => {
     fetchGroup();
     // eslint-disable-next-line
   }, [groupId]);
+
+  const handleAddExpense = async (expenseData) => {
+    await fetchGroup();
+  };
 
   const handleDeleteGroup = () => {
     deleteGroup({
@@ -177,23 +198,60 @@ const Group = () => {
       </div>
 
       {user?.uid === groupData.createdBy && (
-        // <div className="add-expense-bar">
         <button
           className="btn-add-expense full-width"
           onClick={() => setExpenseOpen(true)}
         >
           ➕ Add Expense
         </button>
-        // </div>
       )}
 
-      <AddExpenseModal
-        isOpen={expenseOpen}
-        onClose={() => setExpenseOpen(false)}
-        groupId={groupId}
-        onAdd={handleAddExpense}
-        members={resolvedMembers}
-      />
+      {user && groupData && (
+        <AddExpenseModal
+          isOpen={expenseOpen}
+          onClose={() => setExpenseOpen(false)}
+          groupId={groupId}
+          onAdd={handleAddExpense}
+          members={resolvedMembers}
+          currentUserId={user.uid}
+          currentUserName={user.displayName || user.userName}
+          groupName={groupData.groupName}
+        />
+      )}
+
+      {/* ✅ New breakdown component */}
+      <GroupDebtsBreakdown groupId={groupId} />
+
+      <div className="group-expenses">
+        <h3 className="group-expenses-heading">Expenses</h3>
+        {expenses.length === 0 && <p>No expenses added yet.</p>}
+        <ul className="expense-list">
+          <div className="expense-button-container">
+            {expenses.map((exp) => (
+              <button
+                key={exp.expenseId || exp.id}
+                className="expense-button"
+                onClick={() => setSelectedExpense(exp)}
+              >
+                {exp.title} - ₹{exp.totalAmount?.toFixed(2)}
+              </button>
+            ))}
+          </div>
+        </ul>
+      </div>
+
+      {selectedExpense && (
+        <ExpenseDetailsModal
+          expense={selectedExpense}
+          members={resolvedMembers}
+          onClose={() => setSelectedExpense(null)}
+        />
+      )}
+      <div className="group-chart-section">
+        <h3>Your Personal Expense Balance Overview</h3>
+        <div>{groupId}</div>
+        <UserGroupExpenseCharts groupId={groupId} />
+      </div>
     </>
   );
 };

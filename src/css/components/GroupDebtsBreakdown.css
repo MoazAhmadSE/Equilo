@@ -1,0 +1,84 @@
+.group-debts-breakdown {
+    padding: 1rem;
+    background: #1c1c1c;
+    border-radius: 12px;
+    max-width: 600px;
+    margin: 2rem auto;
+    color: #f0f0f0;
+}
+
+.debt-toggle-header {
+    cursor: pointer;
+    background: #292929;
+    padding: 12px 16px;
+    margin-top: 1rem;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    transition: background 0.3s ease;
+}
+
+.debt-toggle-header:hover {
+    background: #333;
+}
+
+.dropdown-arrow {
+    font-size: 1.1rem;
+    color: #ccc;
+}
+
+.debt-row-list {
+    margin: 0.5rem 0 1rem 1rem;
+}
+
+.debt-row-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #212121;
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin-bottom: 6px;
+}
+
+.debt-user {
+    flex: 2;
+    color: #ddd;
+}
+
+.debt-amount {
+    flex: 1;
+    font-weight: bold;
+    text-align: right;
+}
+
+.no-debts-msg {
+    color: #aaa;
+    font-style: italic;
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.pay-now-button {
+    margin-left: 12px;
+    background-color: #4a6cf7;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+}
+
+.pay-now-button:hover {
+    background-color: #3650d4;
+}
+
+.loading-msg {
+    color: #999;
+    font-style: italic;
+    padding: 0.5rem;
+}
