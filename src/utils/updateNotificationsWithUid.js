@@ -12,7 +12,6 @@ const updateNotificationsWithUid = async (email, uid) => {
 
     for (const docSnap of notiSnap.docs) {
         await updateDoc(docSnap.ref, { userId: uid });
-        // Add notification ID to user's notificationIds array
         await updateDoc(userRef, {
             notificationIds: arrayUnion(docSnap.id),
         });

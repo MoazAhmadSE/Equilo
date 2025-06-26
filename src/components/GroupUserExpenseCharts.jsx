@@ -176,7 +176,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { useAuth } from "../context/AuthContext";
-import useUserProfile from "../hooks/useUserProfile";
+import useUserProfile from "../firebase/utils/useUserProfile";
 
 const buildUserExpenseData = (expenses, user) => {
   const identifiers = [user.userId, user.userEmail];

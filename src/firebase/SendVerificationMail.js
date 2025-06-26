@@ -2,7 +2,6 @@ import { sendEmailVerification } from "firebase/auth";
 
 const SendVerificationMail = async (user) => {
   const actionCodeSettings = {
-    // ✅ Firebase will call this after user clicks email link (redirect + mode/oobCode in URL)
     url: "http://localhost:5173",
     handleCodeInApp: true,
   };

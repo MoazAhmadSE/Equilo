@@ -5,55 +5,60 @@ import { useNavigate } from "react-router-dom";
 
 const useLogin = () => {
     const navigate = useNavigate();
-    const redirect = new URLSearchParams(location.search).get("redirect");
+    const redirect = new URLSearchParams(location.search);
 
     const { loginWithEmailPasswordForm, loginWithGoogle } = useAuth();
 
     const [value, setValue] = useState({
-        userMail: "",
-        userPassword: "",
+        email: "",
+        password: "",
         loading: false,
     });
 
-    const [errors, setErrors] = useState({
-        email: "",
-        password: "",
-    });
-
+    const [errors, setErrors] = useState({});
     const [submitted, setSubmitted] = useState(false);
 
     const focusRef = useRef({
-        userMail: null,
-        userPassword: null,
+        email: null,
+        password: null,
     });
 
     const focusInput = (field) => {
         focusRef.current[field]?.focus();
     };
 
-    const validateEmail = (email) => {
-        if (!email.trim()) return "Email is required";
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Invalid email format";
-        return "";
+    const validators = {
+        email: (email) => {
+            if (!email.trim()) return "Email is required";
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Invalid email format";
+            return "";
+        },
+        password: (password) => {
+            if (!password.trim()) return "Password is required";
+            if (password.length < 6) return "Password must be at least 6 characters";
+            return "";
+        },
+    };
+    const validateFields = () => {
+        for (const field in validators) {
+            const error = validators[field](value[field], value);
+            if (error) {
+                setErrors({ [field]: error });
+                focusInput(field);
+                return false;
+            }
+        }
+
+        setErrors({});
+        return true;
     };
 
-    const validatePassword = (password) => {
-        if (!password.trim()) return "Password is required";
-        if (password.length < 6) return "Password must be at least 6 characters";
-        return "";
-    };
 
     const handleLogin = async (isCaptchaValid, getToken, resetCaptcha) => {
-        if (!submitted) setSubmitted(true); // only once
+        if (!submitted) setSubmitted(true);
 
-        const emailError = validateEmail(value.userMail);
-        const passwordError = validatePassword(value.userPassword);
-
-        if (emailError || passwordError) {
-            setErrors({ email: emailError, password: passwordError });
-            focusInput(emailError ? "userMail" : "userPassword");
-            return;
-        }
+        const isValid = validateFields();
+        if (!isValid) return;
 
         if (!isCaptchaValid) {
             toast.warn("Please complete the CAPTCHA");
@@ -66,17 +71,11 @@ const useLogin = () => {
             return;
         }
 
-        setErrors({ email: "", password: "" });
         setValue((prev) => ({ ...prev, loading: true }));
 
         try {
-            await loginWithEmailPasswordForm(value.userMail, value.userPassword);
-            // Only navigate after successful login
-            if (redirect) {
-                navigate(redirect, { replace: true });
-            } else {
-                navigate("/equilo/home", { replace: true });
-            }
+            await loginWithEmailPasswordForm(value.email, value.password);
+            navigate("/equilo/home");
         } catch (err) {
             console.error(err);
             toast.error("Login failed. Please try again.");
@@ -87,33 +86,32 @@ const useLogin = () => {
     };
 
     const handleForgetPassword = (resetPassword) => () => {
-        setSubmitted(true); // ✅ This line is needed
+        setSubmitted(true);
 
-        const emailError = validateEmail(value.userMail);
-
+        const emailError = validators.email(value.email);
         if (emailError) {
-            setErrors({ email: emailError, password: "" });
-            focusInput("userMail");
+            setErrors({ email: emailError });
+            focusInput("email");
             return;
         }
 
-        resetPassword(value.userMail);
+        resetPassword(value.email);
     };
 
     return {
-        email: value.userMail,
-        password: value.userPassword,
+        email: value.email,
+        password: value.password,
         loading: value.loading,
         errors: {
-            email: submitted ? errors.email : "",
-            password: submitted ? errors.password : "",
+            email: submitted ? errors.email || "" : "",
+            password: submitted ? errors.password || "" : "",
         },
-        setEmail: (val) => {
-            setValue((prev) => ({ ...prev, userMail: val }));
+        setEmail: (email) => {
+            setValue((prev) => ({ ...prev, email }));
             if (submitted) setErrors((prev) => ({ ...prev, email: "" }));
         },
-        setPassword: (val) => {
-            setValue((prev) => ({ ...prev, userPassword: val }));
+        setPassword: (password) => {
+            setValue((prev) => ({ ...prev, password }));
             if (submitted) setErrors((prev) => ({ ...prev, password: "" }));
         },
         handleLogin,

@@ -1,7 +1,7 @@
 import Input from "../components/Input";
 import SVGIcons from "../assets/icons/SVGIcons";
 import { Link } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import useLogin from "../hooks/useLogin";
 import useRecaptcha from "../hooks/useRecaptcha";
@@ -62,18 +62,7 @@ const Login = () => {
         </div>
       ) : (
         <>
-          <form
-            className="login-input-group"
-            onSubmit={async (e) => {
-              e.preventDefault();
-              const token = await getToken();
-              if (!token) {
-                toast.warn("CAPTCHA validation failed");
-                return;
-              }
-              handleLogin(isCaptchaValid, getToken, resetCaptcha);
-            }}
-          >
+          <div className="login-input-group">
             <Input
               placeholder="Email"
               className="input"
@@ -83,7 +72,7 @@ const Login = () => {
                 setEmail(e.target.value.replace(/\s/g, "").toLowerCase())
               }
               ref={(el) => (focusRef.current.userMail = el)}
-              aria-label="Email"
+              // aria-label="Email"
             />
             {errors.email && (
               <div className="login-error-text">{errors.email}</div>
@@ -96,7 +85,7 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value.replace(/\s/g, ""))}
               ref={(el) => (focusRef.current.userPassword = el)}
-              aria-label="Password"
+              // aria-label="Password"
             />
             {errors.password && (
               <div className="login-error-text">{errors.password}</div>
@@ -128,11 +117,13 @@ const Login = () => {
             <button
               className="btn login-btn"
               disabled={loading || googleLoading}
-              type="submit"
+              onClick={() => {
+                handleLogin(isCaptchaValid, getToken, resetCaptcha);
+              }}
             >
               Login
             </button>
-          </form>
+          </div>
 
           <div className="divider-container">
             <hr className="hr-line" />

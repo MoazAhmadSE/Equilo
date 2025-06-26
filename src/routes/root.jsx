@@ -22,8 +22,12 @@ function FirebaseActionRedirect() {
         navigate("/equilo/home", { replace: true });
       }
     } else {
-      // Only redirect to login if NOT already on login or signup or resetpassword or verifyemail
-      const publicPaths = ["/login", "/signup", "/resetpassword", "/verifyemail"];
+      const publicPaths = [
+        "/login",
+        "/signup",
+        "/resetpassword",
+        "/verifyemail",
+      ];
       if (!publicPaths.includes(location.pathname)) {
         navigate("/login", { replace: true });
       }
@@ -31,10 +35,9 @@ function FirebaseActionRedirect() {
   }, [searchParams, location, navigate, user, loading]);
 
   if (loading) {
-    // ✅ Return nothing while waiting — avoids flicker
     return null;
   }
 
-  return null; // This component is redirect-only
+  return null;
 }
 export default FirebaseActionRedirect;

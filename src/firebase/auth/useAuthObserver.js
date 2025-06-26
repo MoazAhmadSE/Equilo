@@ -18,7 +18,6 @@ const useAuthObserver = (setUser, setLoading) => {
         setLoading(false);
       });
 
-    // ✅ Cleanup
     return () => {
       if (unsubscribe) unsubscribe();
     };

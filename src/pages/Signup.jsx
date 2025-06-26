@@ -56,7 +56,7 @@ const Signup = () => {
             <p className="loader-text">
               {loading
                 ? "Signing You Up... Please Wait"
-                : "Signing In with Google..."}
+                : "Signing You Up with Google..."}
             </p>
           </div>
         </div>
@@ -69,7 +69,7 @@ const Signup = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               ref={(el) => (focusRef.current.userName = el)}
-              aria-label="Full Name"
+              // aria-label="Full Name"
             />
             {errors.name && <div className="error-text">{errors.name}</div>}
 
@@ -82,7 +82,7 @@ const Signup = () => {
                 setEmail(e.target.value.replace(/\s/g, "").toLowerCase())
               }
               ref={(el) => (focusRef.current.userMail = el)}
-              aria-label="Email"
+              // aria-label="Email"
             />
             {errors.email && <div className="error-text">{errors.email}</div>}
 
@@ -93,7 +93,7 @@ const Signup = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value.replace(/\s/g, ""))}
               ref={(el) => (focusRef.current.userPassword = el)}
-              aria-label="Password"
+              // aria-label="Password"
             />
             {errors.password && (
               <div className="error-text">{errors.password}</div>
@@ -108,7 +108,7 @@ const Signup = () => {
                 setConfirmPassword(e.target.value.replace(/\s/g, ""))
               }
               ref={(el) => (focusRef.current.confirmUserPassword = el)}
-              aria-label="Confirm Password"
+              // aria-label="Confirm Password"
             />
             {errors.confirmPassword && (
               <div className="error-text">{errors.confirmPassword}</div>
