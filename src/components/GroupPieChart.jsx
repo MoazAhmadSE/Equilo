@@ -170,38 +170,70 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
 import { useAuth } from "../context/AuthContext";
 import { BarChart } from "@mui/x-charts/BarChart";
+import "../css/components/AddExpenseModal.css";
 
-const UserExpenseBarChart = ({ barData, title }) => {
-  if (!barData.length) return <p>No data to display for {title}.</p>;
+const UserExpenseBarChart = ({ paidData, oweData, getData, title }) => {
+  // Extract all unique labels
+  const allLabels = Array.from(
+    new Set([
+      ...paidData.map((d) => d.label),
+      ...oweData.map((d) => d.label),
+      ...getData.map((d) => d.label),
+    ])
+  );
+
+  if (allLabels.length === 0) return <p>No data to display for {title}.</p>;
+
+  // Map series values to x-axis labels
+  const formatSeries = (labels, data) =>
+    labels.map((label) => {
+      const entry = data.find((d) => d.label === label);
+      return entry ? entry.value : 0;
+    });
 
   return (
     <>
-      <h3>{title}</h3>
+      <h3 style={{ color: "var(--text)", marginBottom: "0.5rem" }}>{title}</h3>
       <BarChart
         series={[
           {
-            data: barData.map(({ value }) => value),
-            label: title,
+            data: formatSeries(allLabels, paidData),
+            label: "Total Spent",
+            color: "#2196f3",
+          },
+          {
+            data: formatSeries(allLabels, oweData),
+            label: "Total To Pay",
+            color: "#e91e63",
+          },
+          {
+            data: formatSeries(allLabels, getData),
+            label: "Total To Receive",
+            color: "#4caf50",
           },
         ]}
         xAxis={[
           {
-            scaleType: "band", // <-- Important fix for bar chart
-            data: barData.map(({ label }) => label),
+            scaleType: "band",
+            data: allLabels,
+            tickLabelStyle: {
+              fill: "none",
+            },
+            axisLine: { stroke: "gray" },
+            tickLine: { stroke: "none" },
           },
         ]}
-        width={600}
-        height={300}
-        slotProps={{
-          tooltip: {
-            children: ({ item }) => (
-              <div style={{ padding: 6 }}>
-                <strong>{barData[item.index].label}</strong>
-                <div>Amount: {barData[item.index].value.toFixed(2)}</div>
-              </div>
-            ),
+        yAxis={[
+          {
+            tickLabelStyle: {
+              fill: "none",
+            },
+            axisLine: { stroke: "gray" },
+            tickLine: { stroke: "none" },
           },
-        }}
+        ]}
+        // width={600}
+        height={300}
       />
     </>
   );
@@ -316,14 +348,11 @@ export default function GroupUserExpenseCharts({ groupId }) {
       {loading && <p>Loading... {statusMessage}</p>}
       {!loading && (
         <>
-          <UserExpenseBarChart barData={paidData} title="Total Spent by You" />
           <UserExpenseBarChart
-            barData={oweData}
-            title="Total You Have to Pay"
-          />
-          <UserExpenseBarChart
-            barData={getData}
-            title="Total You Have to Get"
+            paidData={paidData}
+            oweData={oweData}
+            getData={getData}
+            title="Your Expenses Overview"
           />
           {statusMessage && !expenses.length && <p>Status: {statusMessage}</p>}
         </>

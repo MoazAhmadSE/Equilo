@@ -111,7 +111,7 @@ const GroupDebtsBreakdown = () => {
   };
 
   const handlePayNow = async (entry) => {
-    if (!window.confirm(`Confirm payment of ₹${entry.amount.toFixed(2)}?`))
+    if (!window.confirm(`Confirm payment of RS. ${entry.amount.toFixed(2)}?`))
       return;
 
     try {
@@ -184,7 +184,7 @@ const GroupDebtsBreakdown = () => {
                         ? `${e.otherName} owes you`
                         : `You owe ${e.otherName}`}
                     </span>
-                    <span className="debt-amount">₹{e.amount.toFixed(2)}</span>
+                    <span className="debt-amount">RS. {e.amount.toFixed(2)}</span>
                     <span
                       style={{
                         color: e.direction === "down" ? "green" : "red",
