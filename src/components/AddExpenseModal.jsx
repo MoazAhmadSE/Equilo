@@ -128,10 +128,10 @@ const AddExpenseModal = ({
       for (let creditor of sortedCreditors) {
         if (debt === 0) break;
         if (creditor.net === 0) continue;
+        if (debtor.id === creditor.id) continue; // 🚫 Skip self
 
         const payAmount = Math.min(debt, creditor.net);
 
-        // console.log(debtor, creditor);
         settlements.push({
           from: debtor.id,
           to: creditor.id,
@@ -195,16 +195,16 @@ const AddExpenseModal = ({
 
       onClose();
 
-      await sendExpenseNotifications({
-        members,
-        groupName,
-        expenseTitle: description,
-        totalAmount: parseFloat(totalAmount),
-        addedByName: currentUserName,
-        calculatedShares,
-        settlementPlan,
-        groupId,
-      });
+      // await sendExpenseNotifications({
+      //   members,
+      //   groupName,
+      //   expenseTitle: description,
+      //   totalAmount: parseFloat(totalAmount),
+      //   addedByName: currentUserName,
+      //   calculatedShares,
+      //   settlementPlan,
+      //   groupId,
+      // });
     } catch (error) {
       console.error("Failed to add expense:", error);
       alert("Failed to add expense. Please try again.");
@@ -368,11 +368,18 @@ const AddExpenseModal = ({
           <div className="settlement-preview">
             <label>Settlement Plan</label>
             <ul>
-              {settlementPlan.map((s, i) => (
-                <li key={i}>
-                  {s.from} pays {s.to}: {s?.amount?.toFixed(2)}
-                </li>
-              ))}
+              {settlementPlan.map((s, i) => {
+                const fromName =
+                  members.find((m) => m.id === s.from)?.name || s.from;
+                const toName = members.find((m) => m.id === s.to)?.name || s.to;
+
+                return (
+                  <li key={i}>
+                    <strong>{fromName}</strong> have to pays{" "}
+                    <strong>{toName}</strong>: {s?.amount?.toFixed(2)}
+                  </li>
+                );
+              })}
             </ul>
           </div>
 

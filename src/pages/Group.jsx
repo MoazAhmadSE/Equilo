@@ -137,12 +137,118 @@ const Group = () => {
       onRefresh: () => navigate("/equilo/home"),
     });
   };
+  const handleExportGroupData = async () => {
+    try {
+      const uid = user.uid;
+      const myEmail = user.email;
+      const isAdmin = uid === groupData.createdBy;
+
+      const rows = [];
+
+      // ──────────────── Expenses ────────────────
+      rows.push(["Expenses"]);
+      rows.push([
+        "Expense Title",
+        "Total Amount",
+        "User Name",
+        "User ID",
+        "Contribution Amount",
+        "Share Amount",
+      ]);
+
+      for (const exp of expenses) {
+        const contribs = exp.contributions || [];
+        const shares = exp.calculatedShares || [];
+
+        const relevantIds = isAdmin
+          ? [
+              ...new Set([
+                ...contribs.map((c) => c.id),
+                ...shares.map((s) => s.id),
+              ]),
+            ]
+          : [uid, myEmail];
+
+        for (const id of relevantIds) {
+          const contribution = contribs.find((c) => c.id === id);
+          const share = shares.find((s) => s.id === id);
+
+          if (contribution || share) {
+            rows.push([
+              exp.title || "Untitled",
+              exp.totalAmount || 0,
+              resolvedMembers.find((m) => m.id === id)?.name || id,
+              id,
+              contribution?.amount || 0,
+              share?.amount || 0,
+            ]);
+          }
+        }
+      }
+
+      rows.push([""]); // Spacer
+
+      // ──────────────── Payments ────────────────
+      rows.push(["Payments"]);
+      rows.push(["From", "To", "Amount", "Method", "Expense ID"]);
+
+      const q1 = query(
+        collection(db, "payments"),
+        where("groupId", "==", groupId)
+      );
+      const snap = await getDocs(q1);
+      const allPayments = snap.docs.map((d) => d.data());
+
+      const payments = isAdmin
+        ? allPayments
+        : allPayments.filter((p) => p.fromUserId === uid || p.toUserId === uid);
+
+      for (const p of payments) {
+        rows.push([
+          resolvedMembers.find((m) => m.id === p.fromUserId)?.name ||
+            p.fromUserId,
+          resolvedMembers.find((m) => m.id === p.toUserId)?.name || p.toUserId,
+          p.amountPaid || 0,
+          p.method || "N/A",
+          p.expenseId || "-",
+        ]);
+      }
+
+      // ──────────────── Download ────────────────
+      const csv = rows.map((r) => r.join(",")).join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${isAdmin ? "group" : "my"}_data_${groupId}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Export failed:", err);
+    }
+  };
 
   if (loading) return <div className="group-loader">Loading group info...</div>;
   if (!groupData) return <div className="group-error">Group not found.</div>;
 
   return (
     <>
+      <button
+        onClick={handleExportGroupData}
+        style={{
+          marginTop: "1rem",
+          padding: "8px 16px",
+          background: "var(--primary)",
+          color: "#fff",
+          border: "none",
+          borderRadius: "6px",
+          cursor: "pointer",
+        }}
+      >
+        ⬇️ Export {user?.uid === groupData.createdBy ? "Full Group" : "My"} Data
+        (CSV)
+      </button>
+
       <div className="group-page">
         <h2 className="group-title">{groupData.groupName}</h2>
         <p className="group-desc">
@@ -219,9 +325,6 @@ const Group = () => {
         />
       )}
 
-      {/* ✅ New breakdown component */}
-      <GroupDebtsBreakdown groupId={groupId} />
-
       <div className="group-expenses">
         <h3 className="group-expenses-heading">Expenses</h3>
         {expenses.length === 0 && <p>No expenses added yet.</p>}
@@ -233,12 +336,15 @@ const Group = () => {
                 className="expense-button"
                 onClick={() => setSelectedExpense(exp)}
               >
-                {exp.title} - ₹{exp.totalAmount?.toFixed(2)}
+                {exp.title} - RS. {exp.totalAmount?.toFixed(2)}
               </button>
             ))}
           </div>
         </ul>
       </div>
+
+      {/* ✅ New breakdown component */}
+      <GroupDebtsBreakdown groupId={groupId} />
 
       {selectedExpense && (
         <ExpenseDetailsModal
@@ -249,7 +355,6 @@ const Group = () => {
       )}
       <div className="group-chart-section">
         <h3>Your Personal Expense Balance Overview</h3>
-        <div>{groupId}</div>
         <UserGroupExpenseCharts groupId={groupId} />
       </div>
     </>

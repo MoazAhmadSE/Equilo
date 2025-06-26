@@ -1,4 +1,21 @@
-.dashboard-container{
+.dashboard-container {
     /* padding-inline: 12px; */
     /* padding-block: 20px; */
+}
+
+/* Optional for better visual separation */
+.dashboard-container h2 {
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+}
+
+.charts-section {
+    padding: 2rem 1rem;
+    border-top: 1px solid var(--border-light);
+}
+
+.charts-section>div {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px dashed var(--border-light);
 }

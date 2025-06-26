@@ -2,14 +2,20 @@ import React from "react";
 import "../css/components/ExpenseDetailsModal.css";
 
 const ExpenseDetailsModal = ({ expense, members, onClose }) => {
-  const getName = (id) => members.find((m) => m.id === id)?.name || id;
+  const getName = (id) => {
+    const member = members.find(
+      (m) => String(m.id).trim() === String(id).trim()
+    );
+    if (!member) console.warn(`❌ getName failed for ID: '${id}'`);
+    return member?.name || id;
+  };
 
   return (
     <div className="modal-backdrop">
       <div className="modal-box">
         <h2>{expense.title}</h2>
         <p>
-          <strong>Total:</strong> ₹{expense.totalAmount.toFixed(2)}
+          <strong>Total:</strong> RS. {expense.totalAmount.toFixed(2)}
         </p>
 
         <div className="section">
@@ -19,7 +25,7 @@ const ExpenseDetailsModal = ({ expense, members, onClose }) => {
               .filter((c) => c.role === "paid")
               .map((c) => (
                 <li key={c.id}>
-                  {getName(c.id)} — ₹{parseFloat(c.amount).toFixed(2)}
+                  {getName(c.id)} — RS. {parseFloat(c.amount).toFixed(2)}
                 </li>
               ))}
           </ul>
@@ -30,7 +36,7 @@ const ExpenseDetailsModal = ({ expense, members, onClose }) => {
           <ul>
             {expense.calculatedShares.map((s) => (
               <li key={s.id}>
-                {getName(s.id)} — ₹{s.finalAmount.toFixed(2)}
+                {getName(s.id)} — RS. {s.finalAmount.toFixed(2)}
                 {s.note && <em> ({s.note})</em>}
               </li>
             ))}
@@ -40,11 +46,22 @@ const ExpenseDetailsModal = ({ expense, members, onClose }) => {
         <div className="section">
           <h4>Settlement Plan</h4>
           <ul>
-            {expense.settlementPlan.map((s, idx) => (
-              <li key={idx}>
-                {getName(s.from)} pays {getName(s.to)}: ₹{s.amount.toFixed(2)}
-              </li>
-            ))}
+            {expense.settlementPlan.map((s, idx) => {
+              const from = s.from || s.fromUserId;
+              const to = s.to || s.toUserId;
+              const amount = s.amount;
+
+              if (!from || !to || typeof amount !== "number") {
+                console.warn("⚠️ Skipping invalid settlement entry", s);
+                return null;
+              }
+
+              return (
+                <li key={idx}>
+                  {getName(from)} pays {getName(to)}: RS. {amount.toFixed(2)}
+                </li>
+              );
+            })}
           </ul>
         </div>
 

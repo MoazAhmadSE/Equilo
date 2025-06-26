@@ -1,0 +1,50 @@
+/* Apply base font and background */
+.group-expense-charts-container {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-satoshi);
+    padding: 2rem;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    max-width: 100%;
+}
+
+/* Title styles for each chart block */
+.group-expense-charts-container h3 {
+    font-size: var(--font-size-md);
+    margin: 1.5rem 0 0.5rem;
+    color: var(--primary);
+    font-weight: 600;
+}
+
+/* Tooltip style override (if needed for consistency) */
+.MuiChartsTooltip-tooltip {
+    background-color: var(--card) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius) !important;
+    font-size: var(--font-size-sm) !important;
+}
+
+/* Loading and status message styles */
+.group-expense-charts-container p {
+    font-size: var(--font-size-sm);
+    margin-top: 1rem;
+    color: var(--secondary);
+}
+
+/* Optional: Improve spacing between charts */
+.group-expense-charts-container>*:not(:last-child) {
+    margin-bottom: 2rem;
+}
+
+/* Optional: Responsive chart override */
+@media (max-width: 700px) {
+    .group-expense-charts-container {
+        padding: 1rem;
+    }
+
+    .group-expense-charts-container h3 {
+        font-size: 18px;
+    }
+}

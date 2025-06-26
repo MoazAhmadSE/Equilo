@@ -99,7 +99,7 @@ const UserDebtsByGroup = () => {
                 {group.items.map((d, i) => (
                   <div key={i} className="debt-row-item">
                     <span className="debt-user">To: {d.to}</span>
-                    <span className="debt-amount">₹{d.amount.toFixed(2)}</span>
+                    <span className="debt-amount">RS. {d.amount.toFixed(2)}</span>
                     <span style={{ color: "red" }} title="You owe">
                       🔺
                     </span>
