@@ -1,21 +1,29 @@
 import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate, useLocation } from "react-router-dom";
+
+const validators = {
+  userName: (val) => (!val.trim() ? "Full name is required" : ""),
+  userMail: (val) => {
+    if (!val.trim()) return "Email is required";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) return "Invalid email address";
+    return "";
+  },
+  userPassword: (val) =>
+    val.length < 6 ? "Password must be at least 6 characters" : "",
+  confirmUserPassword: (val, allValues) =>
+    val !== allValues.userPassword ? "Passwords do not match" : "",
+};
+
 
 const useSignup = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  // Only get redirect param, don't navigate here!
-  const redirect = new URLSearchParams(location.search).get("redirect");
-
   const { signupWithEmailPasswordForm, loginWithGoogle } = useAuth();
 
   const [value, setValue] = useState({
-    userName: "Moaz 00",
+    userName: "",
     userMail: "",
-    userPassword: "123456",
-    confirmUserPassword: "123456",
+    userPassword: "",
+    confirmUserPassword: "",
     loading: false,
   });
 
@@ -39,56 +47,33 @@ const useSignup = () => {
     focusRef.current[field]?.focus();
   };
 
-  const validateName = (name) => {
-    if (!name.trim()) return "Full name is required";
-    return "";
+  const fieldToErrorKey = {
+    userName: "name",
+    userMail: "email",
+    userPassword: "password",
+    confirmUserPassword: "confirmPassword",
   };
 
-  const validateEmail = (email) => {
-    if (!email.trim()) return "Email is required";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Invalid email address";
-    return "";
-  };
-
-  const validatePassword = (password) => {
-    if (password.length < 6) return "Password must be at least 6 characters";
-    return "";
-  };
-
-  const validateConfirmPassword = (password, confirm) => {
-    if (password !== confirm) return "Passwords do not match";
-    return "";
-  };
-
-  const handleSignup = async (isCaptchaValid, getToken, resetCaptcha) => {
+  const handleSignup = async (isCaptchaValid, getToken) => {
     setSubmitted(true);
 
-    const nameError = validateName(value.userName);
-    if (nameError) {
-      setErrors({ name: nameError, email: "", password: "", confirmPassword: "" });
-      focusInput("userName");
-      return;
-    }
+    for (const field in validators) {
+      const error = validators[field](
+        value[field],
+        value
+      );
 
-    const emailError = validateEmail(value.userMail);
-    if (emailError) {
-      setErrors({ name: "", email: emailError, password: "", confirmPassword: "" });
-      focusInput("userMail");
-      return;
-    }
-
-    const passwordError = validatePassword(value.userPassword);
-    if (passwordError) {
-      setErrors({ name: "", email: "", password: passwordError, confirmPassword: "" });
-      focusInput("userPassword");
-      return;
-    }
-
-    const confirmError = validateConfirmPassword(value.userPassword, value.confirmUserPassword);
-    if (confirmError) {
-      setErrors({ name: "", email: "", password: "", confirmPassword: confirmError });
-      focusInput("confirmUserPassword");
-      return;
+      if (error) {
+        setErrors({
+          name: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+          [fieldToErrorKey[field]]: error,
+        });
+        focusInput(field);
+        return;
+      }
     }
 
     if (!isCaptchaValid) {
@@ -112,13 +97,6 @@ const useSignup = () => {
     });
 
     setValue((prev) => ({ ...prev, loading: false }));
-
-    // // Only navigate after successful signup
-    // if (redirect) {
-    //   navigate(redirect, { replace: true });
-    // } else {
-    //   navigate("/equilo/home", { replace: true });
-    // }
   };
 
   return {
@@ -143,13 +121,7 @@ const useSignup = () => {
     },
     setPassword: (val) => {
       setValue((prev) => ({ ...prev, userPassword: val }));
-      if (submitted) {
-        setErrors((prev) => ({
-          ...prev,
-          password: "",
-          confirmPassword: "",
-        }));
-      }
+      if (submitted) setErrors((prev) => ({ ...prev, password: "", confirmPassword: "" }));
     },
     setConfirmPassword: (val) => {
       setValue((prev) => ({ ...prev, confirmUserPassword: val }));

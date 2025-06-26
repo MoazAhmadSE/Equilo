@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
-import "../css/components/GroupModal.css";
-import { useAuth } from "../context/AuthContext";
+import React, { useState } from "react";
+import "../../css/components/GroupModal.css";
 import { toast } from "react-toastify";
-import sendGroupInviteEmail from "../utils/sendGroupInviteEmail";
-import createGroup from "../firebase/utils/groupHandlers"; // ✅ import helper
-import createNotification from "../firebase/utils/notificationHandlers"; // ✅ import notification handler
+import sendGroupInviteEmail from "../../utils/sendGroupInviteEmail";
+import createGroup from "../../firebase/utils/groupHandlers";
+import createNotification from "../../firebase/utils/notificationHandlers";
 import {
   collection,
   query,
@@ -13,24 +12,16 @@ import {
   setDoc,
   doc,
 } from "firebase/firestore";
-import { db } from "../firebase/firebaseConfig";
+import { db } from "../../firebase/firebaseConfig";
 
-const MakeGroupModal = ({ isOpen, onClose }) => {
+const MakeGroupModal = ({ isOpen, onClose, user }) => {
+  if (!isOpen) return null;
+
   const [groupName, setGroupName] = useState("");
   const [description, setDescription] = useState("");
   const [members, setMembers] = useState([""]);
   const [emailErrors, setEmailErrors] = useState([]);
   const [creating, setCreating] = useState(false);
-  const { user } = useAuth();
-
-  useEffect(() => {
-    if (isOpen) {
-      setGroupName("");
-      setDescription("");
-      setMembers([""]);
-      setEmailErrors([]);
-    }
-  }, [isOpen]);
 
   const handleMemberChange = (index, value) => {
     const updated = [...members];
@@ -64,41 +55,26 @@ const MakeGroupModal = ({ isOpen, onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isFormValid()) return;
-
     setCreating(true);
 
     try {
-      // Filter out the creator's email from invites
       const memberEmails = members
         .map((email) => email.trim().toLowerCase())
         .filter((email) => email && email !== user.email.toLowerCase());
       const uniqueEmails = [...new Set(memberEmails)];
 
-      // Validation
-      if (
-        uniqueEmails.length !==
-        members
-          .map((email) => email.trim().toLowerCase())
-          .filter((email) => email && email !== user.email.toLowerCase()).length
-      ) {
-        toast.error(`❌ Duplicate emails detected.`);
+      if (uniqueEmails.length !== memberEmails.length) {
+        toast.error("❌ Duplicate emails detected.");
         setCreating(false);
         return;
       }
 
-      if (memberEmails.includes(user.email.toLowerCase())) {
-        toast.error("You cannot invite yourself to your own group.");
-        setCreating(false);
-        return;
-      }
-
-      const groupMembers = [user.uid, ...uniqueEmails]; // admin UID + invited emails
-
+      const groupMembers = [user.uid, ...uniqueEmails];
       const groupId = await createGroup({
         groupName: groupName.trim(),
         createdBy: user.uid,
         members: groupMembers,
-        description: description.trim(), // <-- add this line
+        description: description.trim(),
       });
 
       if (!groupId) {
@@ -106,7 +82,6 @@ const MakeGroupModal = ({ isOpen, onClose }) => {
         return;
       }
 
-      // Add group to user's userGroups subcollection
       await setDoc(doc(db, "users", user.uid, "userGroups", groupId), {
         groupId,
         groupName: groupName.trim(),
@@ -114,12 +89,12 @@ const MakeGroupModal = ({ isOpen, onClose }) => {
         role: "admin",
       });
 
-      // ✅ Send invite emails (only to others)
       for (const email of uniqueEmails) {
-        // Check if user exists in Firestore
         let invitedUserId = null;
-        const usersRef = collection(db, "users");
-        const q = query(usersRef, where("userEmail", "==", email));
+        const q = query(
+          collection(db, "users"),
+          where("userEmail", "==", email)
+        );
         const querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
           invitedUserId = querySnapshot.docs[0].id;
@@ -132,7 +107,6 @@ const MakeGroupModal = ({ isOpen, onClose }) => {
           invite_link: `http://localhost:5173/equilo/home/group/join/${groupId}`,
         });
 
-        // Create a notification for the invited user
         await createNotification({
           userId: invitedUserId,
           email,
@@ -143,13 +117,6 @@ const MakeGroupModal = ({ isOpen, onClose }) => {
         });
       }
 
-      console.log(
-        "Inviting these emails:",
-        uniqueEmails,
-        "Admin email:",
-        user.email
-      );
-
       toast.success("✅ Group created and invites sent!");
       onClose();
     } catch (err) {
@@ -159,8 +126,6 @@ const MakeGroupModal = ({ isOpen, onClose }) => {
       setCreating(false);
     }
   };
-
-  if (!isOpen) return null;
 
   return (
     <div className="modal-overlay">

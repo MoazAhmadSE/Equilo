@@ -7,7 +7,7 @@ export const useResetPassword = () => {
     const [isSuccess, setIsSuccess] = useState(false);
 
     const resetPassword = async (email) => {
-        const resetPage = "reset-password";
+        const resetPage = "resetpassword";
         const actionCodeSettings = {
             url: `http://localhost:5173/${resetPage}`,
             handleCodeInApp: true,

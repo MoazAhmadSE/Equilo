@@ -1,5 +1,5 @@
 import useEmailVerification from "../hooks/useEmailVerification";
-import EquiloNoteLoader from "../components/EquiloNoteLoader";
+import EquiloNoteLoader from "../components/home/EquiloNoteLoader";
 import "../css/pages/VerifyEmail.css";
 export default function VerifyEmail() {
   const { checking, resendVerification, loading } = useEmailVerification();

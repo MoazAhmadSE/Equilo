@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import useUserProfile from "../hooks/useUserProfile";
+import useUserProfile from "../firebase/utils/useUserProfile";
 import DecryptedText from "../components/GrettingText";
 import UserGroupExpenseCharts from "../components/GroupUserExpenseCharts";
 import {

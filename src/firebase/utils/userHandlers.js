@@ -16,7 +16,7 @@ const createUserProfile = async (user) => {
             userImage: user.photoURL || "",
             userCreatedAt: serverTimestamp(),
             isOnline: false,
-            notificationIds: [], // <-- Add this line
+            notificationIds: [],
             joinedGroupIds: [],
         });
 

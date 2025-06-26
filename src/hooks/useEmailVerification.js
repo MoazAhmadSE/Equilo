@@ -14,35 +14,33 @@ const useEmailVerification = () => {
     const oobCode = searchParams.get("oobCode");
     const mode = searchParams.get("mode");
 
-    useEffect(() => {
-        const verifyEmail = async () => {
-            console.log("Verifying email with mode:", mode, "and oobCode:", oobCode);
-            if (mode === "verifyEmail" && oobCode) {
-                setLoading(true);
-                try {
-                    await applyActionCode(auth, oobCode);
-                    console.log("Email verification successful.");
-                    toast.success("Email verified successfully!");
-                    // Wait for Firebase to sync currentUser
-                    onAuthStateChanged(auth, (user) => {
-                        console.log("Auth state changed, current user:", auth, user);
-                        if (user) {
-                            console.log("Verified user:", user.email);
-                            navigate("/equilo/home");
-                        } else {
-                            navigate("/login");
-                        }
-                    });
-                } catch (err) {
-                    console.error("Verification failed:", err);
-                    toast.error("Invalid or expired verification link.");
-                    navigate("/");
-                } finally {
-                    setLoading(false);
-                }
+    const verifyEmail = async () => {
+        console.log("Verifying email with mode:", mode, "and oobCode:", oobCode);
+        if (mode === "verifyEmail" && oobCode) {
+            setLoading(true);
+            try {
+                await applyActionCode(auth, oobCode);
+                console.log("Email verification successful.");
+                toast.success("Email verified successfully!");
+                onAuthStateChanged(auth, (user) => {
+                    console.log("Auth state changed, current user:", auth, user);
+                    if (user) {
+                        console.log("Verified user:", user.email);
+                        navigate("/equilo/home");
+                    } else {
+                        navigate("/login");
+                    }
+                });
+            } catch (err) {
+                console.error("Verification failed:", err);
+                toast.error("Invalid or expired verification link.");
+                navigate("/");
+            } finally {
+                setLoading(false);
             }
-        };
-
+        }
+    };
+    useEffect(() => {
         verifyEmail();
     }, [mode, oobCode, navigate]);
 

@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import { doc, onSnapshot } from "firebase/firestore";
-import { db } from "../firebase/firebaseConfig";
-import { useAuth } from "../context/AuthContext";
+import { db } from "../firebaseConfig";
+import { useAuth } from "../../context/AuthContext";
 
 const useUserProfile = () => {
     const { user } = useAuth();
     const [userData, setUserData] = useState();
     const [loading, setLoading] = useState(false);
-    console.log("user", user, user?.uid);
 
     useEffect(() => {
         if (!user || !user.uid) {
@@ -16,7 +15,7 @@ const useUserProfile = () => {
             return;
         }
 
-        setLoading(true); // only set when we have a valid user
+        setLoading(true);
 
         const unsub = onSnapshot(doc(db, "users", user.uid), (docSnap) => {
             if (docSnap.exists()) {

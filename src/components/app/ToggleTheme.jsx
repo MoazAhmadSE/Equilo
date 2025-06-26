@@ -1,5 +1,5 @@
-import useTheme from "../hooks/useTheme";
-import "../css/components/ToggleTheme.css";
+import useTheme from "../../hooks/useTheme";
+import "../../css/components/ToggleTheme.css";
 
 const ToggleTheme = () => {
   const [theme, setTheme] = useTheme();
@@ -9,7 +9,7 @@ const ToggleTheme = () => {
       className="toggle-theme-btn"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
     >
-      {theme === "dark" ? "☀ Light" : "🌙 Dark"}
+      {theme === "dark" ? "☀️ Light" : "🌙 Dark"}
     </button>
   );
 };

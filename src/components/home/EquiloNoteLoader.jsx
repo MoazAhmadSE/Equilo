@@ -1,5 +1,4 @@
-import React from "react";
-import "../css/components/EquiloNoteLoader.css";
+import "../../css/components/EquiloNoteLoader.css";
 
 const EquiloNoteLoader = () => {
   return (
