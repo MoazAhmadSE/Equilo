@@ -23,6 +23,7 @@ const AppRoutes = () => {
         <Route path="signup" element={<Signup />} />
         <Route path="verifyemail" element={<VerifyEmail />} />
         <Route path="resetpassword" element={<ResetPassword />} />
+        
         <Route
           path="equilo/home"
           element={
