@@ -1,5 +1,4 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import App from "../pages/App";
 import Home from "../pages/Home";
 import Group from "../pages/Group";
 import Account from "../pages/Account";
@@ -23,7 +22,7 @@ const AppRoutes = () => {
         <Route path="signup" element={<Signup />} />
         <Route path="verifyemail" element={<VerifyEmail />} />
         <Route path="resetpassword" element={<ResetPassword />} />
-        
+
         <Route
           path="equilo/home"
           element={
