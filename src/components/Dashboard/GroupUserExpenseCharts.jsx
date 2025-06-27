@@ -173,10 +173,10 @@
 // }
 import React, { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "../firebase/firebaseConfig";
-import { BarChart } from "@mui/x-charts/BarChart";
-import { useAuth } from "../context/AuthContext";
-import useUserProfile from "../firebase/utils/useUserProfile";
+import { db } from "../../firebase/firebaseConfig";
+import { BarChart, PieChart } from "@mui/x-charts"; // make sure PieChart is imported
+import { useAuth } from "../../context/AuthContext";
+import useUserProfile from "../../firebase/utils/useUserProfile";
 
 const buildUserExpenseData = (expenses, user) => {
   const identifiers = [user.userId, user.userEmail];
@@ -210,21 +210,18 @@ const buildUserExpenseData = (expenses, user) => {
 const UserGroupExpenseCharts = () => {
   const { user } = useAuth();
   const { userData, loading } = useUserProfile();
+
   const [groupNames, setGroupNames] = useState([]);
-  const [paidData, setPaidData] = useState([]);
-  const [oweData, setOweData] = useState([]);
-  const [getData, setGetData] = useState([]);
+  const [groupsData, setGroupsData] = useState([]);
+  const [selectedGroupIndex, setSelectedGroupIndex] = useState(null);
 
   useEffect(() => {
     if (!user || !userData || loading) return;
 
     const loadData = async () => {
       const groups = userData.joinedGroupIds || [];
-
-      const paidArr = [];
-      const oweArr = [];
-      const getArr = [];
       const names = [];
+      const groupsSummary = [];
 
       for (const groupId of groups) {
         const groupDoc = await getDoc(doc(db, "groups", groupId));
@@ -245,15 +242,12 @@ const UserGroupExpenseCharts = () => {
           userEmail: user.email,
         });
 
-        paidArr.push(paid);
-        oweArr.push(owe);
-        getArr.push(get);
+        groupsSummary.push({ paid, owe, get });
       }
 
       setGroupNames(names);
-      setPaidData(paidArr);
-      setOweData(oweArr);
-      setGetData(getArr);
+      setGroupsData(groupsSummary);
+      setSelectedGroupIndex(names.length > 0 ? 0 : null);
     };
 
     loadData();
@@ -261,38 +255,101 @@ const UserGroupExpenseCharts = () => {
 
   if (loading || !userData || groupNames.length === 0) return null;
 
+  const selectedGroupData =
+    selectedGroupIndex !== null ? groupsData[selectedGroupIndex] : null;
+
+  const pieData = selectedGroupData
+    ? [
+        { id: "Total Spent", value: selectedGroupData.paid, color: "#2196f3" },
+        { id: "Total To Pay", value: selectedGroupData.owe, color: "#e91e63" },
+        {
+          id: "Total To Receive",
+          value: selectedGroupData.get,
+          color: "#4caf50",
+        },
+      ]
+    : [];
+
   return (
-    <div style={{ marginTop: "2rem" }}>
-      <BarChart
-        xAxis={[
-          {
-            scaleType: "band",
-            data: groupNames,
-            // categoryGapRatio: 0.3,
-            // barGapRatio: 0.1,
-          },
-        ]}
-        yAxis={[
-          {
-            tickLabelStyle: {
-              fill: "none",
-            },
-            axisLine: { stroke: "gray" },
-            tickLine: { stroke: "none" },
-          },
-        ]}
-        series={[
-          { data: paidData, label: "Total Spent", color: "#2196f3" },
-          { data: oweData, label: "Total To Pay", color: "#e91e63" },
-          { data: getData, label: "Total To Receive", color: "#4caf50" },
-        ]}
-        height={300}
-        sx={{
-          ".MuiChartsAxis-tickLabel": { fill: "none" },
-          ".MuiChartsAxis-line": { stroke: "gray" },
-          ".MuiChartsAxis-tick": { stroke: "none" },
+    <div
+      style={{
+        display: "flex",
+        gap: "2rem",
+        marginTop: "2rem",
+        color: "var(--text)",
+      }}
+    >
+      <div
+        style={{
+          width: "25%",
+          borderRight: "1px solid var(--border)",
+          paddingRight: "1rem",
+          overflowY: "auto",
+          maxHeight: "400px",
         }}
-      />
+      >
+        <h3>Your Groups</h3>
+        <ul style={{ listStyle: "none", padding: 0 }}>
+          {groupNames.map((name, idx) => (
+            <li
+              key={idx}
+              onClick={() => setSelectedGroupIndex(idx)}
+              style={{
+                cursor: "pointer",
+                padding: "0.5rem",
+                backgroundColor:
+                  selectedGroupIndex === idx ? "var(--card)" : "transparent",
+                borderRadius: "4px",
+                marginBottom: "0.3rem",
+                fontWeight: selectedGroupIndex === idx ? "bold" : "normal",
+              }}
+            >
+              {name}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div style={{ flexGrow: 1 }}>
+        <h3>
+          {selectedGroupIndex !== null ? groupNames[selectedGroupIndex] : ""}
+        </h3>
+        {pieData.length > 0 ? (
+          <PieChart
+            series={[
+              {
+                data: pieData.map((slice) => ({
+                  ...slice,
+                  label: `${slice.id}: ${slice.value.toFixed(2)}`,
+                })),
+                innerRadius: 35,
+                outerRadius: 100,
+                paddingAngle: 2,
+                cornerRadius: 4,
+                startAngle: 0,
+                endAngle: 360,
+                labelPosition: "outside",
+                labels: {
+                  visible: true,
+                  style: { fill: "var(--text)", fontWeight: "bold" },
+                },
+              },
+            ]}
+            height={300}
+            tooltip={false}
+            sx={{
+              ".MuiChartsLegend-root": {
+                color: "var(--text)",
+              },
+              ".MuiChartsLegend-label": {
+                fill: "var(--text)",
+              },
+            }}
+          />
+        ) : (
+          <p>No data to display</p>
+        )}
+      </div>
     </div>
   );
 };

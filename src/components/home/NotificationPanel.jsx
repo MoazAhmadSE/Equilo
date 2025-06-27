@@ -1,5 +1,5 @@
-import React from "react";
 import "../../css/pages/Home.css";
+import SVGIcons from "../../assets/icons/SVGIcons";
 
 const NotificationPanel = ({
   notifications,
@@ -8,28 +8,21 @@ const NotificationPanel = ({
 }) => {
   return (
     <aside className="sidebar right-bar">
-      <p className="hint">🔔 Notifications</p>
+      <p className="notification-title">🔔 Notifications</p>
 
       {notifications.length > 0 ? (
-        <div className="notification-list">
-          {notifications.map((n) => (
+        <div>
+          {notifications.map((notif) => (
             <div
-              key={n.id}
-              className={`notification-item ${n.read ? "read" : "unread"} ${
-                n.link ? "clickable" : ""
-              }`}
-              onClick={() => n.link && onClickNotification(n.link)}
+              key={notif.id}
+              className="notification-item"
+              onClick={() => notif.link && onClickNotification(notif.link)}
             >
-              <span className="message-text">{n.message}</span>
-              <button
-                className="delete-btn"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDeleteNotification(n.id);
-                }}
-              >
-                ❌
-              </button>
+              <span className="message-text">{notif.message}</span>
+              <SVGIcons.closeCross
+                fill="red"
+                onClick={() => onDeleteNotification(notif.id)}
+              />
             </div>
           ))}
         </div>

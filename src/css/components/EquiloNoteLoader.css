@@ -1,12 +1,12 @@
 .equilo-note-loader {
-  width: 80px;
-  height: 50px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: visible;
-  scale: 0.9;
+    width: 80px;
+    height: 50px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+    scale: 0.9;
 }
 
 
@@ -63,24 +63,30 @@
 
 @keyframes cut-left {
 
-    0%,
-    100% {
+    0% {
         transform: translateX(0);
     }
 
     50% {
         transform: translateX(-20px);
     }
+
+    100% {
+        transform: translateX(0);
+    }
 }
 
 @keyframes cut-right {
 
-    0%,
-    100% {
+    0% {
         transform: translateX(0);
     }
 
     50% {
         transform: translateX(20px);
+    }
+
+    100% {
+        transform: translateX(0);
     }
 }

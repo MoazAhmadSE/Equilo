@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { collection, doc, getDoc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
 
 const useUserGroups = (user) => {
@@ -7,22 +7,31 @@ const useUserGroups = (user) => {
 
     useEffect(() => {
         if (!user) return;
-        const ref = collection(db, "users", user.uid, "userGroups");
 
-        const unsub = onSnapshot(ref, async (snap) => {
-            const groups = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-            const valid = [];
-            for (const group of groups) {
-                const gRef = doc(db, "groups", group.groupId);
-                const gSnap = await getDoc(gRef);
-                if (gSnap.exists()) {
-                    valid.push({ ...group, groupName: gSnap.data().groupName || group.groupName });
-                }
+        const userRef = doc(db, "users", user.uid);
+
+        const unsubscribe = onSnapshot(userRef, async (snap) => {
+            if (!snap.exists()) {
+                setUserGroups([]);
+                return;
             }
-            setUserGroups(valid);
+
+            const joinedGroupIds = snap.data().joinedGroupIds || [];
+            if (joinedGroupIds.length === 0) {
+                setUserGroups([]);
+                return;
+            }
+
+            const groupPromises = joinedGroupIds.map(async (groupId) => {
+                const groupDoc = await getDoc(doc(db, "groups", groupId));
+                return groupDoc.exists() ? { id: groupId, ...groupDoc.data() } : null;
+            });
+
+            const groupResults = await Promise.all(groupPromises);
+            setUserGroups(groupResults.filter(Boolean));
         });
 
-        return () => unsub();
+        return () => unsubscribe();
     }, [user]);
 
     return userGroups;
