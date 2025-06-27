@@ -26,7 +26,6 @@ const deleteGroup = async ({
     try {
         const batch = writeBatch(db);
 
-        // Remove groupId from all users
         const userQuery = query(
             collection(db, "users"),
             where("groupIds", "array-contains", groupId)
@@ -38,7 +37,6 @@ const deleteGroup = async ({
             });
         });
 
-        // Delete related notifications
         const notifQuery = query(
             collection(db, "notifications"),
             where("groupId", "==", groupId)
@@ -48,7 +46,6 @@ const deleteGroup = async ({
             batch.delete(notifDoc.ref);
         });
 
-        // Send deletion email to members
         for (const member of members) {
             if (typeof member === "string" && member.includes("@")) {
                 await sendGroupDeletionEmail({
@@ -59,7 +56,6 @@ const deleteGroup = async ({
             }
         }
 
-        // Delete the group document
         batch.delete(doc(db, "groups", groupId));
 
         await batch.commit();

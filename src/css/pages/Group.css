@@ -271,3 +271,27 @@
 .pay-button:hover {
     background-color: var(--secondary);
 }
+
+.export-group-csv-file-button {
+    margin-block: 12px;
+    padding: 8px 16px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.pay-now-btn {
+    padding: 4px 8px;
+    background-color: var(--accent, #4caf50);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.pay-now-btn:hover {
+    background-color: #388e3c;
+}
