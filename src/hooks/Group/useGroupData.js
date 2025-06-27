@@ -1,115 +1,116 @@
-// src/hooks/useGroupData.js
-import { useState, useEffect, useCallback } from "react";
+// hooks/useGroupData.js
+import { useState, useEffect } from "react";
 import { doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "../firebase/firebaseConfig";
-import { useAuth } from "../context/AuthContext";
+import { db } from "../../firebase/firebaseConfig";
+import { useNavigate } from "react-router-dom";
 
-export default function useGroupData(groupId) {
-  const { user } = useAuth();
+export const useGroupData = (groupId, user) => {
+    const [groupData, setGroupData] = useState(null);
+    const [creatorName, setCreatorName] = useState("Loading...");
+    const [resolvedMembers, setResolvedMembers] = useState([]);
+    const [expenses, setExpenses] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
-  const [groupData, setGroupData] = useState(null);
-  const [creatorName, setCreatorName] = useState("Loading...");
-  const [resolvedMembers, setResolvedMembers] = useState([]);
-  const [expenses, setExpenses] = useState([]);
-  const [loading, setLoading] = useState(true);
+    const fetchGroup = async () => {
+        setLoading(true);
+        try {
+            const groupRef = doc(db, "groups", groupId);
+            const groupSnap = await getDoc(groupRef);
+            if (!groupSnap.exists()) {
+                navigate("/equilo/home", { replace: true });
+                return;
+            }
 
-  const fetchGroup = useCallback(async () => {
-    setLoading(true);
-    try {
-      const groupRef = doc(db, "groups", groupId);
-      const groupSnap = await getDoc(groupRef);
-      if (!groupSnap.exists()) {
-        setGroupData(null);
-        return;
-      }
+            const group = groupSnap.data();
+            setGroupData(group);
 
-      const group = groupSnap.data();
+            if (
+                !group.members ||
+                (!group.members.includes(user.uid) &&
+                    !group.members.includes(user.email))
+            ) {
+                navigate("/equilo/home", { replace: true });
+                return;
+            }
 
-      if (
-        !group.members ||
-        (!group.members.includes(user.uid) && !group.members.includes(user.email))
-      ) {
-        setGroupData(null);
-        return;
-      }
+            const creatorRef = doc(db, "users", group.createdBy);
+            const creatorSnap = await getDoc(creatorRef);
+            setCreatorName(
+                creatorSnap.exists() ? creatorSnap.data().userName : group.createdBy
+            );
 
-      setGroupData(group);
+            const uids = group.members.filter((m) => !m.includes("@"));
+            const emails = group.members.filter((m) => m.includes("@"));
 
-      // Fetch creator name
-      const creatorRef = doc(db, "users", group.createdBy);
-      const creatorSnap = await getDoc(creatorRef);
-      setCreatorName(creatorSnap.exists() ? creatorSnap.data().userName : group.createdBy);
+            let resolved = [];
+            if (uids.length > 0) {
+                const usersQuery = query(
+                    collection(db, "users"),
+                    where("userId", "in", uids)
+                );
+                const userSnaps = await getDocs(usersQuery);
 
-      // Resolve members
-      const uids = group.members.filter((m) => !m.includes("@"));
-      const emails = group.members.filter((m) => m.includes("@"));
+                userSnaps.docs.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    resolved.push({
+                        id: data.userId,
+                        name: data.userName,
+                        email: data.userEmail,
+                        isAdmin: data.userId === group.createdBy,
+                        isJoined: true,
+                    });
+                });
+            }
 
-      let resolved = [];
+            emails.forEach((email) => {
+                resolved.push({
+                    id: email,
+                    name: email,
+                    email: email,
+                    isAdmin: false,
+                    isJoined: false,
+                });
+            });
 
-      if (uids.length > 0) {
-        const usersQuery = query(collection(db, "users"), where("userId", "in", uids));
-        const userSnaps = await getDocs(usersQuery);
+            resolved.sort((a, b) => (b.isAdmin ? 1 : 0) - (a.isAdmin ? 1 : 0));
+            setResolvedMembers(resolved);
 
-        userSnaps.docs.forEach((docSnap) => {
-          const data = docSnap.data();
-          resolved.push({
-            id: data.userId,
-            name: data.userName,
-            email: data.userEmail,
-            isAdmin: data.userId === group.createdBy,
-            isJoined: true,
-          });
-        });
-      }
+            if (group.expenseIds && group.expenseIds.length > 0) {
+                const expensePromises = group.expenseIds.map((id) =>
+                    getDoc(doc(db, "expenses", id))
+                );
+                const expenseSnaps = await Promise.all(expensePromises);
 
-      // Add unresolved emails as not joined
-      emails.forEach((email) => {
-        resolved.push({
-          id: email,
-          name: email,
-          email,
-          isAdmin: false,
-          isJoined: false,
-        });
-      });
+                const expensesData = expenseSnaps
+                    .filter((snap) => snap.exists())
+                    // .map((snap) => ({ ...snap.data() }));
+                    .map((snap) => ({ id: snap.id, ...snap.data() }));
 
-      // Sort admin on top
-      resolved.sort((a, b) => (b.isAdmin ? 1 : 0) - (a.isAdmin ? 1 : 0));
+                setExpenses(expensesData);
+            } else {
+                setExpenses([]);
+            }
+        } catch (error) {
+            console.error("Failed to fetch group or expenses:", error);
+            navigate("/equilo/home", { replace: true });
+        } finally {
+            setLoading(false);
+        }
+    };
 
-      setResolvedMembers(resolved);
+    useEffect(() => {
+        if (groupId && user) {
+            fetchGroup();
+        }
+    }, [groupId, user]);
 
-      // Fetch expenses
-      if (group.expenseIds?.length > 0) {
-        const expensePromises = group.expenseIds.map((id) => getDoc(doc(db, "expenses", id)));
-        const expenseSnaps = await Promise.all(expensePromises);
-
-        const expensesData = expenseSnaps
-          .filter((snap) => snap.exists())
-          .map((snap) => ({ id: snap.id, ...snap.data() }));
-
-        setExpenses(expensesData);
-      } else {
-        setExpenses([]);
-      }
-    } catch (error) {
-      console.error("Failed to fetch group or expenses:", error);
-      setGroupData(null);
-    } finally {
-      setLoading(false);
-    }
-  }, [groupId, user]);
-
-  // Load initially and when groupId/user changes
-  useEffect(() => {
-    fetchGroup();
-  }, [fetchGroup]);
-
-  return {
-    groupData,
-    creatorName,
-    resolvedMembers,
-    expenses,
-    loading,
-    refresh: fetchGroup,
-  };
-}
+    return {
+        groupData,
+        creatorName,
+        resolvedMembers,
+        expenses,
+        loading,
+        fetchGroup,
+    };
+};

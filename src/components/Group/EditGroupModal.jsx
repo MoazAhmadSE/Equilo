@@ -1,13 +1,13 @@
 // EditGroupModal.js
 
 import React, { useState, useEffect } from "react";
-import "../css/components/GroupModal.css";
-import { useAuth } from "../context/AuthContext";
+import "../../css/components/GroupModal.css";
+import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-toastify";
-import deleteGroup from "../firebase/utils/deleteGroup";
-import sendGroupInviteEmail from "../utils/sendGroupInviteEmail";
-import createNotification from "../firebase/utils/notificationHandlers";
-import { sendMemberRemovalEmail } from "../utils/sendGroupDeletionNotifications";
+import deleteGroup from "../../firebase/utils/deleteGroup";
+import sendGroupInviteEmail from "../../utils/sendGroupInviteEmail";
+import createNotification from "../../firebase/utils/notificationHandlers";
+import { sendMemberRemovalEmail } from "../../utils/sendGroupDeletionNotifications";
 import {
   doc,
   updateDoc,
@@ -19,7 +19,7 @@ import {
   arrayUnion,
   arrayRemove,
 } from "firebase/firestore";
-import { db } from "../firebase/firebaseConfig";
+import { db } from "../../firebase/firebaseConfig";
 
 const EditGroupModal = ({ isOpen, onClose, groupData, groupId, onRefresh }) => {
   const { user } = useAuth();
@@ -28,41 +28,41 @@ const EditGroupModal = ({ isOpen, onClose, groupData, groupId, onRefresh }) => {
   const [members, setMembers] = useState([]);
   const [memberDetails, setMemberDetails] = useState({});
 
+  async function init() {
+    if (isOpen && groupData) {
+      setGroupName(groupData.groupName);
+      setDescription(groupData.description || "");
+
+      const rawMembers = groupData.members || [];
+      const nonAdminMembers = rawMembers.filter((id) => id !== user.uid);
+      setMembers(nonAdminMembers);
+
+      const allMembers = [user.uid, ...nonAdminMembers];
+      const details = {};
+
+      await Promise.all(
+        allMembers.map(async (uid) => {
+          const userDoc = await getDoc(doc(db, "users", uid));
+          if (userDoc.exists()) {
+            const data = userDoc.data();
+            details[uid] = {
+              name:
+                data.userName ||
+                data.displayName ||
+                data.userEmail ||
+                "Unknown",
+              email: data.userEmail || "unknown@email.com",
+            };
+          } else {
+            details[uid] = { name: "Unregistered", email: "" };
+          }
+        })
+      );
+
+      setMemberDetails(details);
+    }
+  }
   useEffect(() => {
-    const init = async () => {
-      if (isOpen && groupData) {
-        setGroupName(groupData.groupName);
-        setDescription(groupData.description || "");
-
-        const rawMembers = groupData.members || [];
-        const nonAdminMembers = rawMembers.filter((id) => id !== user.uid);
-        setMembers(nonAdminMembers);
-
-        const allMembers = [user.uid, ...nonAdminMembers];
-        const details = {};
-
-        await Promise.all(
-          allMembers.map(async (uid) => {
-            const userDoc = await getDoc(doc(db, "users", uid));
-            if (userDoc.exists()) {
-              const data = userDoc.data();
-              details[uid] = {
-                name:
-                  data.userName ||
-                  data.displayName ||
-                  data.userEmail ||
-                  "Unknown",
-                email: data.userEmail || "unknown@email.com",
-              };
-            } else {
-              details[uid] = { name: "Unregistered", email: "" };
-            }
-          })
-        );
-
-        setMemberDetails(details);
-      }
-    };
     init();
   }, [isOpen, groupData]);
 
@@ -86,8 +86,7 @@ const EditGroupModal = ({ isOpen, onClose, groupData, groupId, onRefresh }) => {
       toast.warn("⚠️ A group must have at least two members.");
       return;
     }
-    const updated = [...members];
-    updated.splice(index, 1);
+    const updated = members.filter((_, i) => i !== index);
     setMembers(updated);
   };
 
@@ -97,12 +96,10 @@ const EditGroupModal = ({ isOpen, onClose, groupData, groupId, onRefresh }) => {
       const filtered = members.filter((id) => id);
       const prevMembers = groupData.members || [];
 
-      // Find removed emails
       const removedEmails = prevMembers.filter(
         (m) => m.includes("@") && !filtered.includes(m)
       );
 
-      // Send removal emails
       for (const email of removedEmails) {
         await sendMemberRemovalEmail({
           to_email: email,
@@ -116,9 +113,7 @@ const EditGroupModal = ({ isOpen, onClose, groupData, groupId, onRefresh }) => {
         (m) => m.includes("@") && !prevEmails.includes(m)
       );
 
-      // Send invites to new emails
       for (const email of newEmails) {
-        // Check if user exists
         let invitedUserId = null;
         const usersRef = collection(db, "users");
         const q = query(usersRef, where("userEmail", "==", email));
@@ -204,7 +199,7 @@ const EditGroupModal = ({ isOpen, onClose, groupData, groupId, onRefresh }) => {
                   value={
                     uid && !uid.includes("@") && memberDetails[uid]
                       ? `${memberDetails[uid].name} (${memberDetails[uid].email})`
-                      : uid // If it's an email, show as-is
+                      : uid
                   }
                   onChange={(e) => {
                     const updated = [...members];

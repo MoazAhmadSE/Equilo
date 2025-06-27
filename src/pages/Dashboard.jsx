@@ -11,7 +11,7 @@ import {
 import { db } from "../firebase/firebaseConfig";
 import "../css/pages/Dashboard.css";
 
-import GreetingSection from "../components/Dashboard/GreetingSection";
+import GreetingSection from "../components/Dashboard/DecryptedText";
 import ChartByGroup from "../components/Dashboard/ChartByGroup";
 
 const Dashboard = () => {

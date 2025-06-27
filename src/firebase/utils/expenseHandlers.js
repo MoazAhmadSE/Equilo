@@ -8,7 +8,7 @@ import {
     increment,
     arrayUnion,
 } from "firebase/firestore";
-import { db } from "../firebaseConfig";
+import { db } from "../../firebase/firebaseConfig";
 
 /**
  * Add expense globally and link to group, update balances in top-level 'balances' collection.
@@ -33,7 +33,6 @@ export const addGroupExpense = async ({
 
         if (amount <= 0) continue;
 
-        // ✅ Use the already extracted UIDs directly
         formattedSettlementPlan.push({
             fromUserId,
             toUserId,
@@ -47,7 +46,7 @@ export const addGroupExpense = async ({
             balanceRef,
             {
                 groupId,
-                expenseId, // 👈 ADD THIS LINE
+                expenseId,
                 fromUserId,
                 toUserId,
                 amount: increment(amount),
@@ -58,9 +57,6 @@ export const addGroupExpense = async ({
         console.log(fromUserId, toUserId, amount);
     }
 
-
-
-    // Store expense in Firestore
     batch.set(expenseRef, {
         expenseId,
         title: description,
@@ -72,7 +68,6 @@ export const addGroupExpense = async ({
         createdAt: serverTimestamp(),
     });
 
-    // Link expense to group
     const groupRef = doc(db, "groups", groupId);
     batch.update(groupRef, {
         expenseIds: arrayUnion(expenseId),

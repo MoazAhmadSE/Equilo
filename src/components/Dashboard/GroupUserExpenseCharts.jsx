@@ -174,7 +174,7 @@
 import React, { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
-import { BarChart, PieChart } from "@mui/x-charts"; // make sure PieChart is imported
+import { BarChart, PieChart } from "@mui/x-charts";
 import { useAuth } from "../../context/AuthContext";
 import useUserProfile from "../../firebase/utils/useUserProfile";
 
