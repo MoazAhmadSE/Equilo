@@ -8,16 +8,24 @@ export const useResetPassword = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
 
-    const [email, setEmail] = useState("");
-    const [newPassword, setNewPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [error, setError] = useState("");
+    const [state, setState] = useState({
+        email: "",
+        newPassword: "",
+        confirmPassword: "",
+        error: "",
+        isPasswordEmpty: false,
+        validPassword: true,
+        isConfirmPasswordEmpty: false,
+        passwordDidMatch: true,
+        isLoading: false,
+    });
 
-    const [isPasswordEmpty, setIsPasswordEmpty] = useState(false);
-    const [validPassword, setValidPassword] = useState(true);
-    const [isConfirmPasswordEmpty, setIsConfirmPasswordEmpty] = useState(false);
-    const [passwordDidMatch, setPasswordDidMatch] = useState(true);
-    const [isLoading, setIsLoading] = useState(false);
+    const validations = {
+        isPasswordEmpty: !!state.newPassword,
+        validPassword: state.newPassword.length >= 6,
+        isConfirmPasswordEmpty: !!state.confirmPassword,
+        passwordDidMatch: state.newPassword === state.confirmPassword,
+    };
 
     const oobCode = searchParams.get("oobCode");
 
@@ -26,68 +34,47 @@ export const useResetPassword = () => {
             checkActionCode(auth, oobCode)
                 .then((info) => {
                     const emailFromCode = info?.data?.email || info?.email || "";
-                    setEmail(emailFromCode);
+                    setState((prev) => ({ ...prev, email: emailFromCode }));
                 })
-                .catch(() => setError("Invalid-or-missing-reset-code"));
+                .catch(() =>
+                    setState((prev) => ({
+                        ...prev,
+                        error: "Invalid-or-missing-reset-code",
+                    }))
+                );
         } else {
-            setError("No reset code found.");
+            setState((prev) => ({ ...prev, error: "No reset code found." }));
         }
     }, [oobCode]);
 
     const handleSubmit = async () => {
-        setIsPasswordEmpty(false);
-        setValidPassword(true);
-        setIsConfirmPasswordEmpty(false);
-        setPasswordDidMatch(true);
 
-        let hasError = false;
+        setState((prev) => ({ ...prev, ...validations }));
 
-        if (!newPassword) {
-            setIsPasswordEmpty(true);
-            hasError = true;
-        }
+        if (Object.values(validations).includes(false)) return;
 
-        if (newPassword.length < 6) {
-            setValidPassword(false);
-            hasError = true;
-        }
-
-        if (!confirmPassword) {
-            setIsConfirmPasswordEmpty(true);
-            hasError = true;
-        }
-
-        if (newPassword !== confirmPassword) {
-            setPasswordDidMatch(false);
-            hasError = true;
-        }
-
-        if (hasError) return;
 
         try {
-            setIsLoading(true);
-            await confirmPasswordReset(auth, oobCode, newPassword);
+            setState((prev) => ({ ...prev, isLoading: true }));
+            await confirmPasswordReset(auth, oobCode, state.newPassword);
             toast.success("Password reset successfully!");
             setTimeout(() => navigate("/login"), 1500);
         } catch (err) {
-            setError(err.message || "Something went wrong.");
+            setState((prev) => ({
+                ...prev,
+                error: err.message || "Something went wrong.",
+            }));
         } finally {
-            setIsLoading(false);
+            setState((prev) => ({ ...prev, isLoading: false }));
         }
     };
 
     return {
-        email,
-        newPassword,
-        confirmPassword,
-        error,
-        isPasswordEmpty,
-        validPassword,
-        isConfirmPasswordEmpty,
-        passwordDidMatch,
-        isLoading,
-        setNewPassword,
-        setConfirmPassword,
+        ...state,
+        setNewPassword: (value) =>
+            setState((prev) => ({ ...prev, newPassword: value })),
+        setConfirmPassword: (value) =>
+            setState((prev) => ({ ...prev, confirmPassword: value })),
         handleSubmit,
     };
 };

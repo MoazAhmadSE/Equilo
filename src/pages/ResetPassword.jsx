@@ -50,14 +50,12 @@ export default function ResetPassword() {
               />
 
               <input
-                className={`reset-input ${
-                  isPasswordEmpty || !validPassword ? "invalid" : ""
-                }`}
+                className="reset-input"
                 type="password"
                 placeholder="Enter new password"
                 value={newPassword}
                 onChange={(e) => {
-                  setNewPassword(e.target.value.trim());
+                  setNewPassword(e.target.value.replace(/\s/g, ""));
                 }}
               />
               {!validPassword && (
@@ -67,9 +65,7 @@ export default function ResetPassword() {
               )}
 
               <input
-                className={`reset-input ${
-                  isConfirmPasswordEmpty || !passwordDidMatch ? "invalid" : ""
-                }`}
+                className="reset-input"
                 type="password"
                 placeholder="Confirm password"
                 value={confirmPassword}

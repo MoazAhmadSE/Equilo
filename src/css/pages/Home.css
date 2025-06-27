@@ -1,109 +1,106 @@
 .home-layout {
-    display: flex;
     height: 100%;
+    display: flex;
     background: var(--bg);
     color: var(--text);
     font-family: var(--font-satoshi);
 }
 
-/* Sidebar styles (shared) */
 .sidebar {
     background: var(--card);
-
-    display: flex;
-    flex-direction: column;
-    width: 250px;
-    flex-shrink: 0;
-}
-
-/* Optional: keep for custom tweaks */
-.left-bar {
-    /* background-color: thistle; */
-    gap: 20px;
-    padding-top: 30px;
-    padding-inline: 30px;
-    height: 90%;
-    display: flex;
-    flex-direction: column;
-    /* gap: 20px; */
+    min-width: 250px;
+    max-width: 250px;
     color: var(--text);
     font-family: var(--font-telma);
     font-size: var(--font-size-md);
+    padding-top: 30px;
+    padding-inline: 25px;
+}
+
+.left-bar {
+    height: 100%;
 }
 
 .animation {
-    /* height: 13%; */
-    margin-bottom: 30px;
+    margin-bottom: 50px;
     display: flex;
     justify-content: center;
-}
-
-.group-devider {
-    border: 1px solid var(--border);
 }
 
 .link {
     all: unset;
     display: flex;
     cursor: pointer;
-    margin-bottom: 20px;
+    margin-block: 20px;
 }
-
 
 .group-container {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 5px;
+}
+
+.group-devider {
+    margin-block: 10px;
+    border: 1px dashed var(--border);
+}
+
+.group-list {
+    height: 50%;
+    overflow-y: auto;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.plus-icon-wrapper {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .right-bar {
-    padding-top: 30px;
-    padding-inline: 10px;
+    height: 100%;
 }
 
 .main-content-center {
     flex-grow: 1;
     padding: 40px;
     overflow-y: auto;
-    min-width: 0;
 }
 
-.user-box {
-    background: var(--card);
-    padding: 20px;
-    border-radius: var(--radius);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-.user-avatar {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid var(--primary);
+.notification-title {
+    padding-block: 10px;
+    border-bottom: 1px dashed var(--border);
+    font-size: var(--font-size-sm);
     margin-bottom: 10px;
 }
 
-.status {
-    font-weight: bold;
-    margin-top: 10px;
+.notification-item {
+    margin-bottom: 10px;
+    padding: 8px 12px;
+    background-color: var(--bg);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    font-size: var(--font-size-sm);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
 }
 
-.status.online {
-    color: green;
+.no-notifications {
+    color: var(--accent);
+    font-size: var(--font-size-sm);
+    padding: 12px;
 }
 
-.status.offline {
-    color: red;
-}
-
-.hint {
-    padding: 10px 0;
-    border-bottom: 1px dashed var(--border);
-    font-size: 0.9rem;
-    color: var(--text);
+.message-text {
+    font-size: var(--font-size-sm);
+    /* display: flex; */
+    word-wrap: break-word;
+    width: 90%;
 }
 
 @media (max-width: 900px) {
@@ -121,163 +118,16 @@
     }
 }
 
-.plus-icon-wrapper {
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.3s ease;
-}
-
-.plus-icon {
-    width: 24px;
-    height: 24px;
-    stroke: var(--primary);
-}
-
-.rotate {
-    animation: rotate360 0.6s ease-in-out;
-}
-
-@keyframes rotate360 {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    /* 50% {
-        transform: rotate(180deg);
-    } */
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-.notification-item {
-    margin-bottom: 10px;
-    background: #f5f7fa;
-    border-radius: 6px;
-    padding: 8px 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-    transition: background 0.2s ease;
-}
-
-.notification-item.unread {
-    color: #222;
-}
-
-.notification-item.read {
-    color: #888;
-}
-
-.notification-item.clickable {
-    cursor: pointer;
-}
-
-.no-notifications {
-    color: #888;
-    padding: 12px;
-}
-
-.notification-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem;
-    gap: 8px;
-    border-bottom: 1px solid #e2e2e2;
-}
-
-.message-text {
-    flex: 1;
-    word-break: break-word;
-}
-
-.delete-btn {
-    background: transparent;
-    border: none;
-    color: #e74c3c;
-    cursor: pointer;
-    font-size: 1rem;
-}
-
-.delete-btn:hover {
-    color: #c0392b;
-}
-
-.group-list {
-    height: 50%;
-    overflow-y: auto;
-    margin-top: 0.5rem;
-    /* mt-2 */
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    /* space-y-2 */
-}
-
 .group-item {
     cursor: pointer;
-    background-color: rgba(255, 255, 255, 0.05);
-    /* bg-white/5 */
-    color: white;
-    /* text-white */
-    font-size: 0.875rem;
-    /* text-sm */
-    padding: 0.5rem 0.75rem;
-    /* px-3 py-2 */
-    border-radius: 0.5rem;
-    /* rounded-lg */
-    transition: background-color 0.2s ease, transform 0.2s ease;
-    /* transition duration-200 */
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    /* shadow-sm */
+    background-color: rgba(214, 214, 214, 0.05);
+    color: var(--text);
+    font-size: var(--font-size-sm);
+    padding: 7px 12px;
+    border-radius: var(--radius);
+    transition: background-color 0.2s ease-in-out;
 }
 
 .group-item:hover {
-    background-color: rgba(74, 108, 247, 0.2);
-    /* hover:bg-blue-500/20 */
-}
-
-.notification-list {
-    height: 70%;
-    width: 100%;
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.notification-item {
-    background-color: var(--bg);
-    padding: 0.75rem;
-    border-radius: 0.5rem;
-    border: 1px solid var(--border);
-    font-size: var(--font-size-sm);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: background-color 0.2s ease;
-}
-
-.notification-item.read {
-    opacity: 0.6;
-}
-
-.notification-item.unread {
-    font-weight: 500;
-}
-
-.notification-item.clickable {
-    cursor: pointer;
-}
-
-.notification-item.clickable:hover {
-    background-color: rgba(74, 108, 247, 0.2);
-}
-
-.message-text {
-    flex: 1;
-    padding-right: 12px;
-    color: var(--text);
+    background-color: var(--secondary);
 }

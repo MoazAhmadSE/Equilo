@@ -1,5 +1,5 @@
-import React, { useState } from "react";
 import "../../css/components/GroupModal.css";
+import React, { useState } from "react";
 import { toast } from "react-toastify";
 import sendGroupInviteEmail from "../../utils/sendGroupInviteEmail";
 import createGroup from "../../firebase/utils/groupHandlers";
@@ -13,68 +13,100 @@ import {
   doc,
 } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
+import SVGIcons from "../../assets/icons/SVGIcons";
 
-const MakeGroupModal = ({ isOpen, onClose, user }) => {
-  if (!isOpen) return null;
+const MakeGroupModal = ({ handleCreateGroupModal, user }) => {
+  const [formData, setFormData] = useState({
+    groupName: "",
+    description: "",
+    members: [""],
+    emailErrors: [],
+  });
 
-  const [groupName, setGroupName] = useState("");
-  const [description, setDescription] = useState("");
-  const [members, setMembers] = useState([""]);
-  const [emailErrors, setEmailErrors] = useState([]);
   const [creating, setCreating] = useState(false);
 
-  const handleMemberChange = (index, value) => {
-    const updated = [...members];
-    updated[index] = value;
-    setMembers(updated);
+  const handleFieldChange = (field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
 
-    const errors = [...emailErrors];
+  const handleMemberChange = (index, value) => {
+    const updated = [...formData.members];
+    updated[index] = value;
+
+    const errors = [...formData.emailErrors];
     errors[index] =
       value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? "Invalid email" : "";
-    setEmailErrors(errors);
+
+    setFormData((prev) => ({
+      ...prev,
+      members: updated,
+      emailErrors: errors,
+    }));
   };
 
   const handleAddMember = () => {
-    setMembers([...members, ""]);
-    setEmailErrors([...emailErrors, ""]);
+    setFormData((prev) => ({
+      ...prev,
+      members: [...prev.members, ""],
+      emailErrors: [...prev.emailErrors, ""],
+    }));
   };
 
   const handleRemoveMember = (index) => {
-    setMembers(members.filter((_, i) => i !== index));
-    setEmailErrors(emailErrors.filter((_, i) => i !== index));
+    setFormData((prev) => ({
+      ...prev,
+      members: prev.members.filter((_, i) => i !== index),
+      emailErrors: prev.emailErrors.filter((_, i) => i !== index),
+    }));
   };
 
   const isFormValid = () => {
-    const errors = members.map((email) =>
-      email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? "Invalid email" : ""
-    );
-    setEmailErrors(errors);
-    return errors.every((err) => !err);
+    const userEmail = user.email.toLowerCase();
+    const seen = new Set();
+    const errors = formData.members.map((rawEmail) => {
+      const email = rawEmail.trim().toLowerCase();
+
+      if (!email) return "";
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return "Invalid email format";
+      }
+
+      if (email === userEmail) {
+        return "You cannot add yourself";
+      }
+
+      if (seen.has(email)) {
+        return "Duplicate email";
+      }
+
+      seen.add(email);
+      return "";
+    });
+
+    setFormData((prev) => ({
+      ...prev,
+      emailErrors: errors,
+    }));
+
+    return errors.every((err) => err === "");
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!isFormValid()) return;
+  const handleSubmit = async () => {
+    const uniqueEmails = isFormValid();
+    if (!uniqueEmails) return;
     setCreating(true);
 
     try {
-      const memberEmails = members
-        .map((email) => email.trim().toLowerCase())
-        .filter((email) => email && email !== user.email.toLowerCase());
-      const uniqueEmails = [...new Set(memberEmails)];
-
-      if (uniqueEmails.length !== memberEmails.length) {
-        toast.error("❌ Duplicate emails detected.");
-        setCreating(false);
-        return;
-      }
-
       const groupMembers = [user.uid, ...uniqueEmails];
       const groupId = await createGroup({
-        groupName: groupName.trim(),
+        groupName: formData.groupName.trim(),
         createdBy: user.uid,
         members: groupMembers,
-        description: description.trim(),
+        description: formData.description.trim(),
       });
 
       if (!groupId) {
@@ -84,7 +116,7 @@ const MakeGroupModal = ({ isOpen, onClose, user }) => {
 
       await setDoc(doc(db, "users", user.uid, "userGroups", groupId), {
         groupId,
-        groupName: groupName.trim(),
+        groupName: formData.groupName.trim(),
         joinedAt: new Date(),
         role: "admin",
       });
@@ -103,7 +135,7 @@ const MakeGroupModal = ({ isOpen, onClose, user }) => {
         await sendGroupInviteEmail({
           to_email: email,
           inviter: user.displayName || user.email,
-          group_name: groupName,
+          group_name: formData.groupName,
           invite_link: `http://localhost:5173/equilo/home/group/join/${groupId}`,
         });
 
@@ -112,13 +144,13 @@ const MakeGroupModal = ({ isOpen, onClose, user }) => {
           email,
           type: "invite",
           groupId,
-          message: `You've been invited to join the group "${groupName}"!`,
-          link: `/equilo/home/group/join/${groupId}`,
+          message: `You've been invited to join the group "${formData.groupName}"!`,
+          link: `http://localhost:5173/equilo/home/group/join/${groupId}`,
         });
       }
 
       toast.success("✅ Group created and invites sent!");
-      onClose();
+      handleCreateGroupModal();
     } catch (err) {
       console.error("❌ Error in MakeGroupModal:", err);
       toast.error("Failed to create group.");
@@ -131,18 +163,18 @@ const MakeGroupModal = ({ isOpen, onClose, user }) => {
     <div className="modal-overlay">
       <div className="modal-content">
         <h2>Create New Group</h2>
-        <form onSubmit={handleSubmit}>
+        <div>
           <input
             type="text"
             placeholder="Group Name"
-            value={groupName}
-            onChange={(e) => setGroupName(e.target.value)}
+            value={formData.groupName}
+            onChange={(e) => handleFieldChange("groupName", e.target.value)}
             required
           />
           <textarea
             placeholder="Group Description (optional)"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            value={formData.description}
+            onChange={(e) => handleFieldChange("description", e.target.value)}
             rows={3}
           />
 
@@ -152,45 +184,61 @@ const MakeGroupModal = ({ isOpen, onClose, user }) => {
               <input type="email" value={user.email} disabled />
               <span className="you-label">You</span>
             </div>
-
-            {members.map((email, index) => (
+            {formData.members.map((email, index) => (
               <div className="member-input" key={index}>
                 <input
                   type="email"
                   placeholder="Member Email"
                   value={email}
                   onChange={(e) =>
-                    handleMemberChange(index, e.target.value.trim())
+                    handleMemberChange(
+                      index,
+                      e.target.value.replace(/\s/g, "").toLowerCase()
+                    )
+                  }
+                  className={
+                    formData.emailErrors[index] === "Duplicate email"
+                      ? "duplicate-border"
+                      : ""
                   }
                   required
                 />
-                <button
-                  type="button"
-                  onClick={() => handleRemoveMember(index)}
+                <SVGIcons.closeCross
+                  fill="red"
                   className="remove-btn"
-                >
-                  ❌
-                </button>
-                {emailErrors[index] && (
-                  <div className="email-error">{emailErrors[index]}</div>
+                  onClick={() => handleRemoveMember(index)}
+                />
+                {formData.emailErrors[index] && (
+                  <div className="email-error">
+                    {formData.emailErrors[index]}
+                  </div>
                 )}
               </div>
             ))}
-
             <p className="add-more" onClick={handleAddMember}>
-              ➕ Add Member
+              <SVGIcons.plus />
+              Add Member
             </p>
           </div>
 
           <div className="modal-buttons">
-            <button type="submit" className="create-btn" disabled={creating}>
+            <button
+              type="button"
+              className="create-btn"
+              onClick={handleSubmit}
+              disabled={creating}
+            >
               {creating ? "Creating..." : "Create Group"}
             </button>
-            <button type="button" onClick={onClose} className="cancel-btn">
+            <button
+              type="button"
+              onClick={handleCreateGroupModal}
+              className="cancel-btn"
+            >
               Cancel
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

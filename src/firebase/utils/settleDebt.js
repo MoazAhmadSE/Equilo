@@ -1,6 +1,6 @@
 // firebase/utils/settleDebt.js
 import { doc, increment, writeBatch, serverTimestamp } from "firebase/firestore";
-import { db } from "../firebase/firebaseConfig";
+import { db } from "../firebaseConfig";
 
 export const settleDebt = async ({ groupId, fromUserId, toUserId, amount }) => {
     const balanceDocId = `${groupId}_${fromUserId}_${toUserId}`;

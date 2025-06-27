@@ -1,4 +1,3 @@
-// src/utils/emailService.js
 import emailjs from '@emailjs/browser';
 
 const SERVICE_ID = 'service_2f8zvft';

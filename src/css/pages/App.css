@@ -3,7 +3,6 @@
     width: 100%;
     height: 70px;
     background-color: var(--card);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     padding-inline: 30px;
     border-bottom: 1px solid var(--border);
 }
@@ -17,25 +16,15 @@
 
 .logo {
     display: none;
-    height: 100%;
     width: 30%;
-    align-items: center;
+    height: 100%;
     justify-content: start;
+    align-items: center;
 }
 
 .logo svg {
-    animation: rotate-logo 4s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+    animation: rotate360 4s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
     transform-origin: center;
-}
-
-@keyframes rotate-logo {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
 }
 
 .app-name {
@@ -178,13 +167,13 @@
     }
 }
 
-/* ----------------- User Dropdown (Updated) ----------------- */
+/* ----------------- User Dropdown ----------------- */
 .user-dropdown {
     position: absolute;
     top: 54px;
     right: 0;
-    /* background: var(--card); */
-    background-color: rgb(106, 106, 106);
+    background: var(--card);
+    /* background-color: rgb(106, 106, 106); */
     border: 1px solid var(--border);
     border-radius: var(--radius);
     min-width: 250px;
@@ -192,7 +181,7 @@
     padding: 10px 0;
     display: flex;
     flex-direction: column;
-    animation: fadeIn 0.25s ease-out;
+    animation: show-user-dropdown 0.25s ease-out;
     transition: all 0.2s ease;
 }
 
@@ -200,7 +189,7 @@
     padding: 12px 20px;
     font-size: 0.96rem;
     font-weight: 500;
-    color: var(--text-primary, #1e293b);
+    color: var(--text);
     background: transparent;
     border: none;
     outline: none;
@@ -212,13 +201,12 @@
 }
 
 .dropdown-item:hover:not(.bold):not(.email) {
-    background-color: var(--hover, #f1f5f9);
-    color: var(--primary, #4a6cf7);
+    background-color: var(--secondary);
 }
 
 .dropdown-item.bold {
     font-weight: 700;
-    font-size: 1.05rem;
+    font-size: var(--font-size-md);
     color: var(--primary);
     cursor: default;
     margin-bottom: 2px;
@@ -226,7 +214,7 @@
 }
 
 .dropdown-item.email {
-    font-size: 0.875rem;
+    font-size: var(--font-size-sm);
     font-weight: 400;
     color: var(--text);
     cursor: default;
@@ -234,28 +222,27 @@
     margin-bottom: 4px;
 }
 
-.dropdown-item.logout {
-    color: #e53935;
-    font-weight: 600;
-}
-
 .user-dropdown hr {
     border: 1px solid var(--border);
     margin: 10px 12px;
 }
 
+.dropdown-item.logout {
+    color: #e53935;
+    font-weight: 600;
+}
 
-@keyframes fadeIn {
+
+@keyframes show-user-dropdown {
     from {
         opacity: 0;
-        transform: translateY(-8px) scale(0.98);
     }
 
     to {
         opacity: 1;
-        transform: translateY(0) scale(1);
     }
 }
+
 
 /* ----------------- Main Content ----------------- */
 .main-content {
@@ -264,4 +251,15 @@
     height: calc(100vh - 70px);
     transition: background-color 0.3s, color 0.3s;
     overflow-y: auto;
+}
+
+/* ----------------- Animations ----------------- */
+@keyframes rotate360 {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }

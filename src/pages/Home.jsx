@@ -1,8 +1,8 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 import useUserGroups from "../hooks/home/useUserGroups";
 import useNotifications from "../hooks/home/useNotifications";
-import { useAuth } from "../context/AuthContext";
 import MakeGroupModal from "../components/home/MakeGroupModal";
 import NotificationPanel from "../components/home/NotificationPanel";
 import cleanupInviteNotification from "../firebase/utils/cleanupInviteNotification";
@@ -28,11 +28,12 @@ const Home = () => {
         handleCreateGroupModal={toggleMakeGroupModal}
       />
 
-      <MakeGroupModal
-        isOpen={showMakeGroupModal}
-        onClose={toggleMakeGroupModal}
-        user={user}
-      />
+      {showMakeGroupModal && (
+        <MakeGroupModal
+          handleCreateGroupModal={toggleMakeGroupModal}
+          user={user}
+        />
+      )}
 
       <main className="main-content-center">
         <Outlet />

@@ -1,0 +1,38 @@
+.join-group-container {
+    max-width: 500px;
+    margin: 100px auto;
+    padding: 2rem;
+    background-color: var(--card);
+    color: var(--text);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    text-align: center;
+    font-family: var(--font-satoshi);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.join-group-container h2 {
+    font-size: var(--font-size-md);
+    margin-bottom: 1.5rem;
+}
+
+.join-group-container button {
+    background-color: var(--primary);
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    font-size: var(--font-size-sm);
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.join-group-container button:hover:not(:disabled) {
+    background-color: #3954d7;
+}
+
+.join-group-container button:disabled {
+    background-color: #cbd5e1;
+    cursor: not-allowed;
+}

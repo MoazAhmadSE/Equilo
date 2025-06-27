@@ -2,60 +2,65 @@ import { useAuth } from "../context/AuthContext";
 import { replaceEmailWithUidInGroups } from "../firebase/utils/groupHandlers";
 import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
-import { doc, setDoc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  getDoc,
+  updateDoc,
+  arrayUnion,
+  serverTimestamp,
+} from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
 import createNotification from "../firebase/utils/notificationHandlers";
 import cleanupInviteNotification from "../firebase/utils/cleanupInviteNotification";
+import "../css/pages/JoinGroupPage.css";
 
 const JoinGroupPage = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { groupId } = useParams();
-  const navigate = useNavigate();
   const [joining, setJoining] = useState(false);
+  const [groupName, setGroupName] = useState();
 
   const handleAcceptInvite = async () => {
     if (!user) return;
+
     setJoining(true);
 
     try {
-      // 1. Replace email in group doc
       await replaceEmailWithUidInGroups(user.email, user.uid);
 
-      // 2. Get group details
       const groupDocRef = doc(db, "groups", groupId);
       const groupDocSnap = await getDoc(groupDocRef);
 
       if (!groupDocSnap.exists()) throw new Error("Group not found");
 
       const groupData = groupDocSnap.data();
+      setGroupName(groupData.groupName);
+      console.log(groupData.groupName);
 
-      // 3. Add group to user subcollection
+
       await setDoc(doc(db, "users", user.uid, "userGroups", groupId), {
         groupId,
         groupName: groupData.groupName,
-        joinedAt: new Date(),
+        joinedAt: serverTimestamp(),
         role: "member",
       });
 
-      // 4. Add group ID to main user document
       await updateDoc(doc(db, "users", user.uid), {
         joinedGroupIds: arrayUnion(groupId),
       });
 
-      // 5. Notify group admin
       await createNotification({
-        userId: groupData.createdBy, // admin only
+        userId: groupData.createdBy,
         type: "invite-accepted",
         groupId,
         message: `${user.email} has accepted your invite to join "${groupData.groupName}"!`,
-        link: `/equilo/home/group/join/${groupId}`,
       });
 
-      // 6. Clean up old invite notification
-      await cleanupInviteNotification(user.uid, groupId, user.email);
+      await cleanupInviteNotification(user.uid, groupId);
 
-      // ✅ Redirect
-      navigate(`/equilo/home`);
+      navigate(`/equilo/home/group/join/${groupId}`);
     } catch (err) {
       console.error("❌ Error accepting invite:", err);
     } finally {
@@ -64,8 +69,8 @@ const JoinGroupPage = () => {
   };
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>You've been invited to join this group!</h2>
+    <div className="join-group-container">
+      <h2>You've been invited to join this group! {groupName}</h2>
       <button onClick={handleAcceptInvite} disabled={joining}>
         {joining ? "Joining..." : "Join Group"}
       </button>

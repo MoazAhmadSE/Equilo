@@ -74,22 +74,41 @@ const SVGIcons = {
     <svg
       width={width}
       height={height}
-      className={className}
       viewBox="0 0 24 24"
       xmlns="http://www.w3.org/2000/svg"
+      className={className}
     >
       <path
         d="M12 6V18"
-        stroke={fill} // <-- uses stroke, not fill
+        stroke={fill}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M6 12H18"
-        stroke={fill} // <-- uses stroke, not fill
+        stroke={fill}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+    </svg>
+  ),
+  closeCross: ({
+    height = "30",
+    width = "30",
+    fill = "#4a6cf7",
+    className = "",
+    onClick = "",
+  }) => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      height={height}
+      viewBox="0 -960 960 960"
+      width={width}
+      fill={fill}
+      className={className}
+      onClick={onClick}
+    >
+      <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
     </svg>
   ),
 };

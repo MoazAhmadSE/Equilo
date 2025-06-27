@@ -8,33 +8,22 @@ const useNotifications = (user) => {
     useEffect(() => {
         if (!user) return;
 
-        const q1 = query(collection(db, "notifications"), where("userId", "==", user.uid));
-        const q2 = query(collection(db, "notifications"), where("email", "==", user.email));
+        const q = query(
+            collection(db, "notifications"),
+            where("userId", "==", user.uid)
+        );
 
-        const buffers = { userId: [], email: [] };
-
-        const merge = () => {
-            const merged = new Map();
-            [...buffers.userId, ...buffers.email].forEach((doc) => {
-                merged.set(doc.id, { id: doc.id, ...doc.data() });
-            });
-            setNotifications(Array.from(merged.values()));
-        };
-
-        const unsub1 = onSnapshot(q1, (snap) => {
-            buffers.userId = snap.docs;
-            merge();
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const notis = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
+            console.log(snapshot.docs);
+            notis.sort((a, b) => b.createdAt?.seconds - a.createdAt?.seconds);
+            setNotifications(notis);
         });
 
-        const unsub2 = onSnapshot(q2, (snap) => {
-            buffers.email = snap.docs;
-            merge();
-        });
-
-        return () => {
-            unsub1();
-            unsub2();
-        };
+        return () => unsubscribe();
     }, [user]);
 
     return notifications;

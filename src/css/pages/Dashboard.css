@@ -1,9 +1,7 @@
 .dashboard-container {
-    /* padding-inline: 12px; */
-    /* padding-block: 20px; */
+    position: relative;
 }
 
-/* Optional for better visual separation */
 .dashboard-container h2 {
     font-size: 1.4rem;
     margin-bottom: 0.5rem;
@@ -18,4 +16,31 @@
     margin-bottom: 3rem;
     padding-bottom: 2rem;
     border-bottom: 1px dashed var(--border-light);
+}
+
+.export-button {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    padding: 8px 16px;
+    background: var(--primary);
+    color: var(--text);
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.export-button.disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.charts-heading {
+    color: var(--primary);
+    margin-top: 2rem;
+}
+
+.no-groups-text {
+    color: var(--text);
 }

@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
-import "../css/components/GrettingText.css";
+import "../../css/components/GrettingText.css";
 
-export default function DecryptedText({
+function GrettingText({
   text,
   speed = 50,
   maxIterations = 10,
@@ -222,3 +222,4 @@ export default function DecryptedText({
     </motion.span>
   );
 }
+export default GrettingText;

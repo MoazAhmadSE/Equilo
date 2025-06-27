@@ -11,14 +11,17 @@ import { db } from "../firebaseConfig";
 const createNotification = async ({
     userId = null,
     email = null,
-    type,
+    type = "",
     groupId = null,
-    message,
+    message = "",
     link = null,
 }) => {
-    
+
+    if (!userId && !email) {
+        console.warn("Skipping notification: no userId or email provided");
+        return;
+    }
     try {
-        // Build notification object conditionally
         const notificationData = {
             ...(userId && { userId }),
             ...(email && { email }),
@@ -27,14 +30,12 @@ const createNotification = async ({
             message,
             link,
             createdAt: serverTimestamp(),
-            read: false,
         };
 
         const notificationRef = await addDoc(collection(db, "notifications"), notificationData);
 
-        console.log("✅ Notification created:", notificationRef.id);
+        console.log("✅ Notification created:", notificationRef);
 
-        // Optional: Add notification ID to user profile (only if userId is provided)
         if (userId) {
             await updateDoc(doc(db, "users", userId), {
                 notificationIds: arrayUnion(notificationRef.id),
