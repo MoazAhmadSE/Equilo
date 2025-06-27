@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 import Header from "../components/app/Header";
 import "../css/pages/App.css";
 
-const App = () => {
+const App = ( ) => {
   return (
     <>
       <Header />
