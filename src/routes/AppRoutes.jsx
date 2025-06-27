@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import App from "../pages/App";
 import Home from "../pages/Home";
 import Group from "../pages/Group";
 import Account from "../pages/Account";
