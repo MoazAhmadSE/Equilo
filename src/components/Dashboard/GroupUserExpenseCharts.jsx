@@ -336,7 +336,7 @@ const UserGroupExpenseCharts = () => {
               },
             ]}
             height={300}
-            tooltip={false}
+            // tooltip={false}
             sx={{
               ".MuiChartsLegend-root": {
                 color: "var(--text)",

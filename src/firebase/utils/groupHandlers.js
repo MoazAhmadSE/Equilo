@@ -22,6 +22,7 @@ const createGroup = async ({ groupName, createdBy, members, description = "" }) 
 
     const groupRef = doc(db, "groups", groupId);
     batch.set(groupRef, {
+        groupName,
         groupId,
         createdBy,
         createdAt: serverTimestamp(),
@@ -30,12 +31,12 @@ const createGroup = async ({ groupName, createdBy, members, description = "" }) 
         expenseIds: [],
     });
 
-    const userGroupRef = doc(db, "users", createdBy, "userGroups", groupId);
-    batch.set(userGroupRef, {
-        groupId,
-        groupName,
-        joinedAt: serverTimestamp(),
-    });
+    // const userGroupRef = doc(db, "users", createdBy, "userGroups", groupId);
+    // batch.set(userGroupRef, {
+    //     groupId,
+    //     groupName,
+    //     joinedAt: serverTimestamp(),
+    // });
 
     batch.update(doc(db, "users", createdBy), {
         joinedGroupIds: arrayUnion(groupId),

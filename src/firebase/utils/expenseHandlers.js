@@ -1,5 +1,3 @@
-// src/firebase/utils/expenseHandlers.js
-
 import {
     doc,
     collection,
@@ -10,9 +8,6 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
 
-/**
- * Add expense globally and link to group, update balances in top-level 'balances' collection.
- */
 export const addGroupExpense = async ({
     groupId,
     description,
@@ -54,7 +49,7 @@ export const addGroupExpense = async ({
             },
             { merge: true }
         );
-        console.log(fromUserId, toUserId, amount);
+        // console.log(fromUserId, toUserId, amount);
     }
 
     batch.set(expenseRef, {

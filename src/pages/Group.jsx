@@ -1,22 +1,23 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { ToastContainer, toast } from "react-toastify";
 
+import { useAuth } from "../context/AuthContext";
 import { useGroupData } from "../hooks/Group/useGroupData";
+import useGroupPayment from "../hooks/Group/useGroupPayment";
 
 import GroupHeader from "../components/Group/GroupHeader";
 import GroupMembersList from "../components/Group/GroupMembersList";
 import GroupActions from "../components/Group/GroupActions";
 import ExpensesList from "../components/Group/ExpensesList";
 import ExportButton from "../components/Group/ExportButton";
-
 import EditGroupModal from "../components/Group/EditGroupModal";
 import AddExpenseModal from "../components/Group/AddExpenseModal";
 import ExpenseDetailsModal from "../components/ExpenseDetailsModal";
 import UserGroupExpenseCharts from "../components/GroupPieChart";
 
 import deleteGroup from "../firebase/utils/deleteGroup";
-
+import "react-toastify/dist/ReactToastify.css";
 import "../css/pages/Group.css";
 
 const Group = () => {
@@ -33,6 +34,8 @@ const Group = () => {
     fetchGroup,
   } = useGroupData(groupId, user);
 
+  const { handlePay } = useGroupPayment(user, fetchGroup);
+
   const [editOpen, setEditOpen] = useState(false);
   const [expenseOpen, setExpenseOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
@@ -40,15 +43,31 @@ const Group = () => {
   if (loading) return <div className="group-loader">Loading group info...</div>;
   if (!groupData) return <div className="group-error">Group not found.</div>;
 
-  const handleDeleteGroup = () => {
-    deleteGroup({
-      groupId,
-      groupData,
-      members: groupData.members,
-      user,
-      onClose: () => setEditOpen(false),
-      onRefresh: () => navigate("/equilo/home"),
-    });
+  const handleDeleteGroup = async () => {
+    try {
+      const hasUnsettledPayments = expenses.some(
+        (expense) => expense.settlementPlan && expense.settlementPlan.length > 0
+      );
+
+      if (hasUnsettledPayments) {
+        toast.error(
+          "Please clear all unsettled balances before deleting the group."
+        );
+        return;
+      }
+
+      deleteGroup({
+        groupId,
+        groupData,
+        members: groupData.members,
+        user,
+        onClose: () => setEditOpen(false),
+        onRefresh: () => navigate("/equilo/home"),
+      });
+    } catch (err) {
+      console.error("❌ Error checking unsettled payments:", err.message);
+      toast.error("Failed to verify group status.");
+    }
   };
 
   return (
@@ -63,9 +82,7 @@ const Group = () => {
 
       <div className="group-page">
         <GroupHeader groupData={groupData} creatorName={creatorName} />
-
         <GroupMembersList members={resolvedMembers} />
-
         <GroupActions
           isAdmin={user?.uid === groupData.createdBy}
           onDelete={handleDeleteGroup}
@@ -108,15 +125,26 @@ const Group = () => {
       <ExpensesList
         expenses={expenses.map((exp) => {
           let direction = null;
-          const paid = exp.contributions?.find(
-            (c) => c.id === user.uid && c.role === "paid"
-          );
-          const share = exp.calculatedShares?.find((s) => s.id === user.uid);
 
-          if (share && share.finalAmount > 0 && !paid) {
-            direction = "up"; // you owe money
-          } else if (paid && share && paid.amount > share.finalAmount) {
-            direction = "down"; // others owe you
+          // const paid = exp.contributions?.find(
+          //   (c) => c.id === user.uid && c.role === "paid"
+          // );
+          // const share = exp.calculatedShares?.find((s) => s.id === user.uid);
+
+          const isOwing = exp.settlementPlan?.some(
+            (entry) => entry.fromUserId === user.uid
+          );
+
+          const isReceiving = exp.settlementPlan?.some(
+            (entry) => entry.toUserId === user.uid
+          );
+
+          if (isOwing) {
+            direction = "up";
+          } else if (isReceiving) {
+            direction = "down";
+          } else {
+            direction = null;
           }
 
           return { ...exp, direction };
@@ -130,16 +158,17 @@ const Group = () => {
           members={resolvedMembers}
           currentUserId={user.uid}
           onClose={() => setSelectedExpense(null)}
-          onPay={({ to, amount }) => {
-            console.log("🔥 You are paying ₹" + amount + " to " + to);
-            // Firestore ya confirmation logic yahan
-          }}
+          onPay={({ to, amount }) =>
+            handlePay({ to, amount, expenseId: selectedExpense.id, groupId })
+          }
         />
       )}
 
       <div className="group-chart-section">
         <UserGroupExpenseCharts groupId={groupId} />
       </div>
+
+      <ToastContainer position="top-center" />
     </>
   );
 };

@@ -28,7 +28,7 @@ const EditGroupModal = ({ isOpen, onClose, groupData, groupId, onRefresh }) => {
   const [members, setMembers] = useState([]);
   const [memberDetails, setMemberDetails] = useState({});
 
-  async function init() {
+  async function initValues() {
     if (isOpen && groupData) {
       setGroupName(groupData.groupName);
       setDescription(groupData.description || "");
@@ -63,19 +63,9 @@ const EditGroupModal = ({ isOpen, onClose, groupData, groupId, onRefresh }) => {
     }
   }
   useEffect(() => {
-    init();
+    initValues();
   }, [isOpen, groupData]);
 
-  const handleGroupDelete = () => {
-    deleteGroup({
-      groupId,
-      groupData,
-      members,
-      user,
-      onClose,
-      onRefresh,
-    });
-  };
 
   const handleAddMember = () => {
     setMembers([...members, ""]);
@@ -228,13 +218,6 @@ const EditGroupModal = ({ isOpen, onClose, groupData, groupId, onRefresh }) => {
             </button>
             <button type="button" onClick={onClose} className="cancel-btn">
               Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleGroupDelete}
-              className="danger-btn"
-            >
-              🗑️ Delete Group
             </button>
           </div>
         </form>

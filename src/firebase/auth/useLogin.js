@@ -22,6 +22,7 @@ const useLogin = (setUser, setLoading) => {
                 try {
                     await SendVerificationMail(currentUser);
                     toast.warn("Email not verified. Verification mail sent again.");
+                    navigate("/verifyemail");
                 } catch (err) {
                     if (err.code === "auth/too-many-requests") {
                         toast.error("Too many attempts. Please try again later.");
@@ -30,7 +31,6 @@ const useLogin = (setUser, setLoading) => {
                     }
                 }
 
-                navigate("/verifyemail");
                 // await signOut(auth);
                 return;
             }
