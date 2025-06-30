@@ -1,26 +1,32 @@
 import { useEffect, useState } from "react";
 import { disableNetwork, enableNetwork } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
+import { toast } from "react-toastify";
 
 function useFirestoreNetworkManager() {
     const [isOnline, setIsOnline] = useState(navigator.onLine);
 
     const handleConnectionChange = async () => {
-        try {
-            setIsOnline(navigator.onLine);
-            if (navigator.onLine) {
+        setIsOnline(navigator.onLine);
+        if (navigator.onLine) {
+            console.log("[+] Enabling Firestore network");
+            try {
                 await enableNetwork(db);
-                console.log("You are Online");
-            } else {
-                await disableNetwork(db);
-                console.log("You are Offline");
+            } catch (err) {
+                console.error("Enable network failed", err);
             }
-        } catch (error) {
-            console.error(error);
+        } else {
+            console.log("[-] Disabling Firestore network");
+            toast.error("You are Offline.");
+            try {
+                await disableNetwork(db);
+            } catch (err) {
+                console.error("Disable network failed", err);
+            }
         }
     };
     useEffect(() => {
-        handleConnectionChange();
+
         window.addEventListener("online", handleConnectionChange);
         window.addEventListener("offline", handleConnectionChange);
 

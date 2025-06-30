@@ -13,7 +13,6 @@ const createUserProfile = async (user) => {
             userId: user.uid,
             userName: user.displayName || "New User",
             userEmail: user.email,
-            userImage: user.photoURL || "",
             userCreatedAt: serverTimestamp(),
             isOnline: false,
             notificationIds: [],

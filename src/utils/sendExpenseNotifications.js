@@ -5,18 +5,6 @@ const SERVICE_ID = "service_2f8zvft";
 const TEMPLATE_ID = "template_84n8cxj";
 const PUBLIC_KEY = "YIdWslct_842CYmQh";
 
-/**
- * Sends personalized email notifications to group members after a new expense.
- * @param {Object} options
- * @param {Array} options.members - Full member list [{ id, name, email, isJoined }]
- * @param {String} options.groupName
- * @param {String} options.expenseTitle
- * @param {Number} options.totalAmount
- * @param {String} options.addedByName
- * @param {Array} options.calculatedShares - [{ id, name, finalAmount, note }]
- * @param {Array} options.settlementPlan - [{ from, to, amount }]
- * @param {String} options.groupId - for link construction
- */
 export const sendExpenseNotifications = async ({
     members,
     groupName,

@@ -99,9 +99,13 @@ const MakeGroupModal = ({ handleCreateGroupModal, user }) => {
     const uniqueEmails = isFormValid();
     if (!uniqueEmails) return;
     setCreating(true);
+    console.log("👀 Group Name Entered:", formData.groupName);
+    console.log("🧠 Trimmed Group Name:", formData.groupName.trim());
 
+    console.log(uniqueEmails);
+    console.log(formData.members);
     try {
-      const groupMembers = [user.uid, ...uniqueEmails];
+      const groupMembers = [user.uid, ...formData.members];
       const groupId = await createGroup({
         groupName: formData.groupName.trim(),
         createdBy: user.uid,
@@ -114,14 +118,14 @@ const MakeGroupModal = ({ handleCreateGroupModal, user }) => {
         return;
       }
 
-      await setDoc(doc(db, "users", user.uid, "userGroups", groupId), {
-        groupId,
-        groupName: formData.groupName.trim(),
-        joinedAt: new Date(),
-        role: "admin",
-      });
+      // await setDoc(doc(db, "users", user.uid, "userGroups", groupId), {
+      //   groupId,
+      //   groupName: formData.groupName.trim(),
+      //   joinedAt: new Date(),
+      //   role: "admin",
+      // });
 
-      for (const email of uniqueEmails) {
+      for (const email of formData.members) {
         let invitedUserId = null;
         const q = query(
           collection(db, "users"),
@@ -145,7 +149,7 @@ const MakeGroupModal = ({ handleCreateGroupModal, user }) => {
           type: "invite",
           groupId,
           message: `You've been invited to join the group "${formData.groupName}"!`,
-          link: `http://localhost:5173/equilo/home/group/join/${groupId}`,
+          link: `/equilo/home/group/join/${groupId}`,
         });
       }
 

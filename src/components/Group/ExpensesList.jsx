@@ -1,3 +1,5 @@
+import SVGIcons from "../../assets/icons/SVGIcons";
+
 const ExpensesList = ({ expenses, onSelect }) => {
   return (
     <div className="group-expenses">
@@ -9,11 +11,13 @@ const ExpensesList = ({ expenses, onSelect }) => {
           <div className="expense-button-container">
             {expenses.map((exp) => {
               const icon =
-                exp.direction === "up"
-                  ? "📤"
-                  : exp.direction === "down"
-                  ? "💰"
-                  : "➖";
+                exp.direction === "up" ? (
+                  <SVGIcons.redArrowUp />
+                ) : exp.direction === "down" ? (
+                  <SVGIcons.greenArrowDown />
+                ) : (
+                  "✅"
+                );
 
               return (
                 <button

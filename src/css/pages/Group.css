@@ -295,3 +295,7 @@
 .pay-now-btn:hover {
     background-color: #388e3c;
 }
+.group-chart-section{
+    width: 100%;
+    background-color: #4a6cf7;
+}
