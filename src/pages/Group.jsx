@@ -23,6 +23,7 @@ import "../css/pages/Group.css";
 const Group = () => {
   const { groupId } = useParams();
   const { user } = useAuth();
+  console.log(user);
   const navigate = useNavigate();
 
   const {

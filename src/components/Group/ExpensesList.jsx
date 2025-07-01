@@ -16,17 +16,19 @@ const ExpensesList = ({ expenses, onSelect }) => {
                 ) : exp.direction === "down" ? (
                   <SVGIcons.greenArrowDown />
                 ) : (
-                  "✅"
+                  <SVGIcons.tick />
                 );
 
               return (
-                <button
+                <div
                   key={exp.expenseId || exp.id}
                   className="expense-button"
                   onClick={() => onSelect(exp)}
                 >
-                  {icon} {exp.title} – RS. {exp.totalAmount?.toFixed(2)}
-                </button>
+                  <div className="expense-button-title">{exp.title}</div>
+                  <div className="expense-button-total-amount">Total RS. {exp.totalAmount?.toFixed(2)}</div>
+                  <div className="expense-button-icon">{icon}</div>
+                </div>
               );
             })}
           </div>

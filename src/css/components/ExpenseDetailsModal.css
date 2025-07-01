@@ -41,6 +41,7 @@
     font-weight: 700;
     margin-bottom: 16px;
     color: var(--primary);
+    overflow-wrap: break-word;
 }
 
 .total-amount {
@@ -72,15 +73,19 @@ ul {
     line-height: 1.5;
 }
 
+.pay-box h4{
+    color: var(--accent);
+}
+
 .pay-box {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
     border: 1px solid var(--border, #ddd);
     border-radius: var(--radius, 8px);
     padding: 16px;
     margin-top: 20px;
     font-size: 0.95em;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
 }
 
 .payment-pay-box {

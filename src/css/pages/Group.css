@@ -142,108 +142,75 @@
 }
 
 .group-expenses {
-    margin-top: 2rem;
+    background-color: var(--card);
+    padding: 50px 30px;
+    margin-top: 20px;
     width: 100%;
 }
 
 .group-expenses-heading {
-    font-size: var(--font-size-md);
+    font-size: var(--font-size-lg);
     font-weight: 600;
     font-family: var(--font-satoshi);
-    margin-bottom: 1rem;
 }
 
 .expense-list {
     list-style: none;
     padding: 0;
     margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    width: 100%;
 }
 
 .expense-item {
-    /* display: flex; */
-    /* justify-content: space-between; */
     align-items: center;
-    padding: 12px 16px;
     background-color: var(--card);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     font-family: var(--font-satoshi);
     font-size: var(--font-size-sm);
     color: var(--text);
     transition: transform 0.15s ease, box-shadow 0.2s ease;
-    /* width: 100%; */
-    box-sizing: border-box;
-    word-break: break-word;
-    cursor: pointer;
-}
-
-.expense-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(74, 108, 247, 0.15);
-    background-color: var(--bg);
-    border-color: var(--primary);
-}
-
-.expense-title {
-    font-size: var(--font-size-md);
-    font-weight: 600;
-    flex: 1;
-    margin-right: 1rem;
-    word-break: break-word;
-}
-
-.expense-amount {
-    font-size: var(--font-size-sm);
-    color: var(--primary);
-    font-weight: 500;
-    white-space: nowrap;
-}
-
-.expense-details-btn {
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 10px 14px;
-    font-size: 0.9rem;
-    border-radius: var(--radius);
-    cursor: pointer;
-    transition: background 0.2s ease;
-}
-
-.expense-details-btn:hover {
-    background: #385ae0;
+    width: 100%;
 }
 
 .expense-button-container {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 10px;
-    width: 100%;
-    padding: 10px 0;
 }
 
 .expense-button {
-    background-color: var(--card);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    background-color: transparent;
     border: 1px solid var(--border);
     border-radius: 8px;
     padding: 10px 16px;
-    font-family: var(--font-satoshi);
     font-size: var(--font-size-sm);
     color: var(--text);
     cursor: pointer;
-    white-space: nowrap;
     transition: all 0.2s ease-in-out;
 }
 
 .expense-button:hover {
-    background-color: var(--primary);
-    color: white;
-    transform: scale(1.03);
+    border: 1px solid var(--secondary);
+}
+
+.expense-button-title {
+    width: 40%;
+    overflow-wrap: break-word;
+}
+
+.expense-button-total-amount {
+    padding-left: 5%;
+    width: 40%;
+}
+
+.expense-button-icon {
+    width: 20%;
+    display: flex;
+    justify-content: end;
 }
 
 .user-debts-block {
@@ -295,7 +262,12 @@
 .pay-now-btn:hover {
     background-color: #388e3c;
 }
-.group-chart-section{
+
+.group-chart-section {
     width: 100%;
-    background-color: #4a6cf7;
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-block: 20px;
+    color: var(--text);
 }

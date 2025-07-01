@@ -32,7 +32,7 @@ const ExpenseDetailsModal = ({
         <p className="total-amount">
           <strong>Total:</strong>{" "}
           <span className="highlight">
-            ₹{Number(expense.totalAmount || 0).toFixed(2)}
+            RS.{Number(expense.totalAmount || 0).toFixed(2)}
           </span>
         </p>
 
@@ -44,7 +44,7 @@ const ExpenseDetailsModal = ({
                 .filter((c) => c.role === "paid")
                 .map((c) => (
                   <li key={c.id}>
-                    {getName(c.id)} — ₹{parseFloat(c.amount).toFixed(2)}
+                    {getName(c.id)} — RS.{parseFloat(c.amount).toFixed(2)}
                   </li>
                 ))}
             </ul>
@@ -57,7 +57,7 @@ const ExpenseDetailsModal = ({
             <ul>
               {expense.calculatedShares.map((s) => (
                 <li key={s.id}>
-                  {getName(s.id)} — ₹{s.finalAmount.toFixed(2)}
+                  {getName(s.id)} — RS.{s.finalAmount.toFixed(2)}
                   {s.note && <em> ({s.note})</em>}
                 </li>
               ))}
@@ -81,7 +81,7 @@ const ExpenseDetailsModal = ({
 
                 return (
                   <li key={idx}>
-                    {getName(from)} ➜ {getName(to)}: ₹{amount.toFixed(2)}
+                    {getName(from)} ➜ {getName(to)}: RS.{amount.toFixed(2)}
                   </li>
                 );
               })}
@@ -96,7 +96,7 @@ const ExpenseDetailsModal = ({
               <strong className="highlight">
                 {getName(yourSettlement.to || yourSettlement.toUserId)}
               </strong>
-              : ₹{yourSettlement.amount.toFixed(2)}
+              : RS.{yourSettlement.amount.toFixed(2)}
             </p>
             <button
               className="btn-pay"
@@ -118,7 +118,7 @@ const ExpenseDetailsModal = ({
             {peopleWhoOweYou.map((s, idx) => (
               <div key={idx} className="debt-row-item">
                 <span>
-                  {getName(s.fromUserId || s.from)} owes you: ₹
+                  {getName(s.fromUserId || s.from)} owes you: RS.
                   {s.amount.toFixed(2)}
                 </span>
               </div>
