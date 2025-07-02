@@ -56,6 +56,8 @@ const Header = () => {
                     e.stopPropagation();
                     alert("Redirect to Change Password Page");
                   }}
+                  showDropdown={showDropdown}
+                  setShowDropdown={setShowDropdown}
                 />
               )}
             </div>

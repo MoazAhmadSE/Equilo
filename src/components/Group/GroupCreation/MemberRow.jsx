@@ -1,6 +1,3 @@
-// components/partials/MemberRow.js
-import React from "react";
-
 const MemberRow = ({ member, contribution, onChange }) => {
   const { id, name, email, isJoined } = member;
   const c = contribution;

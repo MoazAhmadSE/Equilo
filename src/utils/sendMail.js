@@ -35,3 +35,4 @@ export async function sendInviatationMail({ groupMembers, groupCreatedBy, groupN
         return error;
     }
 }
+

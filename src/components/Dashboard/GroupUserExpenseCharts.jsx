@@ -296,7 +296,7 @@ const UserGroupExpenseCharts = () => {
               onClick={() => setSelectedGroupIndex(idx)}
               style={{
                 cursor: "pointer",
-                padding: "0.5rem",
+                padding: "0.3rem 1rem",
                 backgroundColor:
                   selectedGroupIndex === idx ? "var(--card)" : "transparent",
                 borderRadius: "4px",

@@ -36,14 +36,14 @@ const MakeGroupModal = ({ handleCreateGroupModal, user }) => {
     const updated = [...formData.members];
     updated[index] = value;
 
-    const errors = [...formData.emailErrors];
-    errors[index] =
-      value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? "Invalid email" : "";
+    // const errors = [...formData.emailErrors];
+    // errors[index] =
+    //   value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? "Invalid email" : "";
 
     setFormData((prev) => ({
       ...prev,
       members: updated,
-      emailErrors: errors,
+      // emailErrors: errors,
     }));
   };
 
@@ -184,34 +184,36 @@ const MakeGroupModal = ({ handleCreateGroupModal, user }) => {
 
           <div className="member-section">
             <label>Group Members:</label>
-            <div className="member-input">
+            <div className="email-input">
               <input type="email" value={user.email} disabled />
               <span className="you-label">You</span>
             </div>
             {formData.members.map((email, index) => (
               <div className="member-input" key={index}>
-                <input
-                  type="email"
-                  placeholder="Member Email"
-                  value={email}
-                  onChange={(e) =>
-                    handleMemberChange(
-                      index,
-                      e.target.value.replace(/\s/g, "").toLowerCase()
-                    )
-                  }
-                  className={
-                    formData.emailErrors[index] === "Duplicate email"
-                      ? "duplicate-border"
-                      : ""
-                  }
-                  required
-                />
-                <SVGIcons.closeCross
-                  fill="red"
-                  className="remove-btn"
-                  onClick={() => handleRemoveMember(index)}
-                />
+                <div className="email-input">
+                  <input
+                    type="email"
+                    placeholder="Member Email"
+                    value={email}
+                    onChange={(e) =>
+                      handleMemberChange(
+                        index,
+                        e.target.value.replace(/\s/g, "").toLowerCase()
+                      )
+                    }
+                    className={
+                      formData.emailErrors[index] === "Duplicate email"
+                        ? "duplicate-border"
+                        : ""
+                    }
+                    required
+                  />
+                  <SVGIcons.closeCross
+                    fill="red"
+                    className="remove-btn"
+                    onClick={() => handleRemoveMember(index)}
+                  />
+                </div>
                 {formData.emailErrors[index] && (
                   <div className="email-error">
                     {formData.emailErrors[index]}
