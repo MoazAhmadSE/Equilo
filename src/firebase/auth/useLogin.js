@@ -1,14 +1,20 @@
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
-// import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
-import { auth, db } from "../../firebase/firebaseConfig";
-// import NewUser from "../utils/userHandlers";
+import { auth } from "../../firebase/firebaseConfig";
 import SendVerificationMail from "../SendVerificationMail";
 
 const useLogin = (setUser, setLoading) => {
     const navigate = useNavigate();
     const location = useLocation();
+
+    const errorMessages = {
+        "auth/invalid-email": "Invalid email format.",
+        "auth/user-not-found": "No user found with this email.",
+        "auth/wrong-password": "Incorrect password.",
+        "auth/too-many-requests": "Too many attempts. Try again later.",
+        "auth/user-disabled": "This user account has been disabled.",
+    };
 
     return async (email, password) => {
         setLoading(true);
@@ -21,28 +27,18 @@ const useLogin = (setUser, setLoading) => {
             if (!currentUser.emailVerified) {
                 try {
                     await SendVerificationMail(currentUser);
-                    toast.warn("Email not verified. Verification mail sent again.");
-                    navigate("/verifyemail");
                 } catch (err) {
                     if (err.code === "auth/too-many-requests") {
                         toast.error("Too many attempts. Please try again later.");
                     } else {
                         toast.error("Failed to send verification email.");
                     }
+                    return;
                 }
 
                 // await signOut(auth);
                 return;
             }
-
-            // const userRef = doc(db, "users", currentUser.uid);
-            // const userDoc = await getDoc(userRef);
-
-            // if (!userDoc.exists()) {
-            //     await NewUser(currentUser);
-            // } else {
-            //     await updateDoc(userRef, { isOnline: true });
-            // }
 
             setUser(currentUser);
             toast.success("Logged in successfully!");
@@ -50,25 +46,9 @@ const useLogin = (setUser, setLoading) => {
             navigate(redirect || "/equilo/home");
         } catch (error) {
             console.error("Login Error:", error.code, error.message);
-            switch (error.code) {
-                case "auth/invalid-email":
-                    toast.error("Invalid email format.");
-                    break;
-                case "auth/user-not-found":
-                    toast.error("No user found with this email.");
-                    break;
-                case "auth/wrong-password":
-                    toast.error("Incorrect password.");
-                    break;
-                case "auth/too-many-requests":
-                    toast.error("Too many attempts. Try again later.");
-                    break;
-                case "auth/user-disabled":
-                    toast.error("This user account has been disabled.");
-                    break;
-                default:
-                    toast.error("Login failed. " + error.message);
-            }
+            const message = errorMessages[error.code] || "Login failed. " + error.message;
+            toast.error(message);
+
         } finally {
             setLoading(false);
         }

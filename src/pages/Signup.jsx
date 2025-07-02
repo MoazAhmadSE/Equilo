@@ -8,24 +8,18 @@ import useSignup from "../hooks/useSignup";
 import useRecaptcha from "../hooks/useRecaptcha";
 import ReCaptchaBox from "../components/ReCaptchaBox";
 import { useState } from "react";
+import FormInput from "../components/FormInput";
 
 const Signup = () => {
   const [googleLoading, setGoogleLoading] = useState(false);
-
   const {
-    name,
-    email,
-    password,
-    confirmPassword,
+    values,
     errors,
     loading,
-    setName,
-    setEmail,
-    setPassword,
-    setConfirmPassword,
+    setField,
     handleSignup,
     focusRef,
-    handleGoogleSignup: originalGoogleSignup,
+    handleGoogleSignup: signInWithGoogle,
   } = useSignup();
 
   const {
@@ -38,7 +32,7 @@ const Signup = () => {
 
   const handleGoogleSignup = async () => {
     setGoogleLoading(true);
-    await originalGoogleSignup();
+    await signInWithGoogle();
     setGoogleLoading(false);
   };
 
@@ -63,57 +57,44 @@ const Signup = () => {
       ) : (
         <>
           <div className="signup-input-group">
-            <Input
+            <FormInput
+              name="userName"
               placeholder="Full Name"
-              className="input"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              ref={(el) => (focusRef.current.userName = el)}
-              // aria-label="Full Name"
+              value={values.userName}
+              error={errors.userName}
+              onChange={setField}
+              focusRef={focusRef}
             />
-            {errors.name && <div className="error-text">{errors.name}</div>}
 
-            <Input
+            <FormInput
+              name="userMail"
               placeholder="Email"
-              className="input"
               type="email"
-              value={email}
-              onChange={(e) =>
-                setEmail(e.target.value.replace(/\s/g, "").toLowerCase())
-              }
-              ref={(el) => (focusRef.current.userMail = el)}
-              // aria-label="Email"
+              value={values.userMail}
+              error={errors.userMail}
+              onChange={setField}
+              focusRef={focusRef}
             />
-            {errors.email && <div className="error-text">{errors.email}</div>}
 
-            <Input
+            <FormInput
+              name="userPassword"
               placeholder="Password"
-              className="input"
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value.replace(/\s/g, ""))}
-              ref={(el) => (focusRef.current.userPassword = el)}
-              // aria-label="Password"
+              value={values.userPassword}
+              error={errors.userPassword}
+              onChange={setField}
+              focusRef={focusRef}
             />
-            {errors.password && (
-              <div className="error-text">{errors.password}</div>
-            )}
 
-            <Input
+            <FormInput
+              name="confirmUserPassword"
               placeholder="Confirm Password"
-              className="input"
               type="password"
-              value={confirmPassword}
-              onChange={(e) =>
-                setConfirmPassword(e.target.value.replace(/\s/g, ""))
-              }
-              ref={(el) => (focusRef.current.confirmUserPassword = el)}
-              // aria-label="Confirm Password"
+              value={values.confirmUserPassword}
+              error={errors.confirmUserPassword}
+              onChange={setField}
+              focusRef={focusRef}
             />
-            {errors.confirmPassword && (
-              <div className="error-text">{errors.confirmPassword}</div>
-            )}
-
             <ReCaptchaBox
               recaptchaRef={recaptchaRef}
               setIsCaptchaValid={setIsCaptchaValid}
@@ -136,8 +117,8 @@ const Signup = () => {
 
           <button
             className="btn-google"
-            onClick={handleGoogleSignup}
             disabled={loading || googleLoading}
+            onClick={handleGoogleSignup}
           >
             <SVGIcons.google />
             Sign up with Google

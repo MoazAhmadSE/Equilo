@@ -8,6 +8,7 @@ import useRecaptcha from "../hooks/useRecaptcha";
 import ReCaptchaBox from "../components/ReCaptchaBox";
 import { useState } from "react";
 import { useResetPassword } from "../firebase/auth/useResetPassword";
+import FormInput from "../components/FormInput";
 import "../css/pages/Login.css";
 
 const Login = () => {
@@ -63,33 +64,25 @@ const Login = () => {
       ) : (
         <>
           <div className="login-input-group">
-            <Input
+            <FormInput
+              name="email"
               placeholder="Email"
-              className="input"
               type="email"
               value={email}
-              onChange={(e) =>
-                setEmail(e.target.value.replace(/\s/g, "").toLowerCase())
-              }
-              ref={(el) => (focusRef.current.userMail = el)}
-              // aria-label="Email"
+              onChange={(val) => setEmail(val.replace(/\s/g, "").toLowerCase())}
+              focusRef={focusRef}
+              error={errors.email}
             />
-            {errors.email && (
-              <div className="login-error-text">{errors.email}</div>
-            )}
 
-            <Input
+            <FormInput
+              name="password"
               placeholder="Password"
-              className="input"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value.replace(/\s/g, ""))}
-              ref={(el) => (focusRef.current.userPassword = el)}
-              // aria-label="Password"
+              onChange={(val) => setPassword(val.replace(/\s/g, ""))}
+              focusRef={focusRef}
+              error={errors.password}
             />
-            {errors.password && (
-              <div className="login-error-text">{errors.password}</div>
-            )}
 
             <div
               className="forgot-password-container"

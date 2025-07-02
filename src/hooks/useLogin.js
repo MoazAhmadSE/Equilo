@@ -1,31 +1,25 @@
 import { useState, useRef } from "react";
-import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const useLogin = () => {
     const navigate = useNavigate();
-    const redirect = new URLSearchParams(location.search);
-
     const { loginWithEmailPasswordForm, loginWithGoogle } = useAuth();
 
-    const [value, setValue] = useState({
-        email: "",
-        password: "",
-        loading: false,
-    });
-
+    const [values, setValues] = useState({ email: "", password: "" });
     const [errors, setErrors] = useState({});
     const [submitted, setSubmitted] = useState(false);
+    const [loading, setLoading] = useState(false);
 
-    const focusRef = useRef({
-        email: null,
-        password: null,
-    });
+    const focusRef = useRef({ email: null, password: null });
 
-    const focusInput = (field) => {
-        focusRef.current[field]?.focus();
+    const setField = (field, value) => {
+        setValues((prev) => ({ ...prev, [field]: value }));
+        if (submitted) setErrors((prev) => ({ ...prev, [field]: "" }));
     };
+
+    const focusInput = (field) => focusRef.current[field]?.focus();
 
     const validators = {
         email: (email) => {
@@ -39,26 +33,23 @@ const useLogin = () => {
             return "";
         },
     };
+
     const validateFields = () => {
         for (const field in validators) {
-            const error = validators[field](value[field], value);
+            const error = validators[field](values[field]);
             if (error) {
                 setErrors({ [field]: error });
                 focusInput(field);
                 return false;
             }
         }
-
         setErrors({});
         return true;
     };
 
-
     const handleLogin = async (isCaptchaValid, getToken, resetCaptcha) => {
         if (!submitted) setSubmitted(true);
-
-        const isValid = validateFields();
-        if (!isValid) return;
+        if (!validateFields()) return;
 
         if (!isCaptchaValid) {
             toast.warn("Please complete the CAPTCHA");
@@ -71,49 +62,40 @@ const useLogin = () => {
             return;
         }
 
-        setValue((prev) => ({ ...prev, loading: true }));
-
+        setLoading(true);
         try {
-            await loginWithEmailPasswordForm(value.email, value.password);
+            await loginWithEmailPasswordForm(values.email, values.password);
             navigate("/equilo/home");
         } catch (err) {
             console.error(err);
             toast.error("Login failed. Please try again.");
             resetCaptcha?.();
         } finally {
-            setValue((prev) => ({ ...prev, loading: false }));
+            setLoading(false);
         }
     };
 
     const handleForgetPassword = (resetPassword) => () => {
         setSubmitted(true);
-
-        const emailError = validators.email(value.email);
+        const emailError = validators.email(values.email);
         if (emailError) {
             setErrors({ email: emailError });
             focusInput("email");
             return;
         }
-
-        resetPassword(value.email);
+        resetPassword(values.email);
     };
 
     return {
-        email: value.email,
-        password: value.password,
-        loading: value.loading,
+        email: values.email,
+        password: values.password,
+        loading,
         errors: {
             email: submitted ? errors.email || "" : "",
             password: submitted ? errors.password || "" : "",
         },
-        setEmail: (email) => {
-            setValue((prev) => ({ ...prev, email }));
-            if (submitted) setErrors((prev) => ({ ...prev, email: "" }));
-        },
-        setPassword: (password) => {
-            setValue((prev) => ({ ...prev, password }));
-            if (submitted) setErrors((prev) => ({ ...prev, password: "" }));
-        },
+        setEmail: (email) => setField("email", email),
+        setPassword: (password) => setField("password", password),
         handleLogin,
         focusRef,
         handleGoogleLogin: loginWithGoogle,
