@@ -2,76 +2,47 @@ import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
 
-const validators = {
-  userName: (val) => (!val.trim() ? "Full name is required" : ""),
-  userMail: (val) => {
-    if (!val.trim()) return "Email is required";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) return "Invalid email address";
-    return "";
-  },
-  userPassword: (val) =>
-    val.length < 6 ? "Password must be at least 6 characters" : "",
-  confirmUserPassword: (val, allValues) =>
-    val !== allValues.userPassword ? "Passwords do not match" : "",
+const validate = {
+  userName: (v) => (!v.trim() ? "Full name is required" : ""),
+  userMail: (v) => !v.trim() ? "Email is required" :
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? "Invalid email address" : "",
+  userPassword: (v) => v.length < 6 ? "Password must be at least 6 characters" : "",
+  confirmUserPassword: (v, all) => v !== all.userPassword ? "Passwords do not match" : "",
 };
-
 
 const useSignup = () => {
   const { signupWithEmailPasswordForm, loginWithGoogle } = useAuth();
 
-  const [value, setValue] = useState({
-    userName: "",
-    userMail: "",
-    userPassword: "",
-    confirmUserPassword: "",
-    loading: false,
+  const [values, setValues] = useState({
+    userName: "", userMail: "", userPassword: "", confirmUserPassword: ""
   });
-
-  const [errors, setErrors] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const focusRef = useRef({
-    userName: null,
-    userMail: null,
-    userPassword: null,
-    confirmUserPassword: null,
-  });
+  const focusRef = useRef({});
 
-  const focusInput = (field) => {
+  const setField = (field, val) => {
+    setValues((prev) => ({ ...prev, [field]: val }));
+    if (submitted) {
+      setErrors((prev) => ({ ...prev, [field]: "" }));
+    }
+  };
+
+  const focusField = (field) => {
     focusRef.current[field]?.focus();
   };
 
-  const fieldToErrorKey = {
-    userName: "name",
-    userMail: "email",
-    userPassword: "password",
-    confirmUserPassword: "confirmPassword",
-  };
-
-  const handleSignup = async (isCaptchaValid, getToken) => {
+  const handleSignup = async (isCaptchaValid, getToken, resetCaptcha) => {
     setSubmitted(true);
+    const newErrors = {};
 
-    for (const field in validators) {
-      const error = validators[field](
-        value[field],
-        value
-      );
-
+    for (const field in validate) {
+      const error = validate[field](values[field], values);
       if (error) {
-        setErrors({
-          name: "",
-          email: "",
-          password: "",
-          confirmPassword: "",
-          [fieldToErrorKey[field]]: error,
-        });
-        focusInput(field);
+        newErrors[field] = error;
+        setErrors(newErrors);
+        focusField(field);
         return;
       }
     }
@@ -83,52 +54,27 @@ const useSignup = () => {
 
     const token = await getToken();
     if (!token) {
-      toast.warn("CAPTCHA validation failed.");
+      toast.warn("CAPTCHA validation failed");
       return;
     }
 
-    setErrors({ name: "", email: "", password: "", confirmPassword: "" });
-    setValue((prev) => ({ ...prev, loading: true }));
-
+    setLoading(true);
     await signupWithEmailPasswordForm({
-      userName: value.userName,
-      userMail: value.userMail,
-      userPassword: value.userPassword,
+      userName: values.userName,
+      userMail: values.userMail,
+      userPassword: values.userPassword,
     });
-
-    setValue((prev) => ({ ...prev, loading: false }));
+    setLoading(false);
+    // resetCaptcha();
   };
 
   return {
-    name: value.userName,
-    email: value.userMail,
-    password: value.userPassword,
-    confirmPassword: value.confirmUserPassword,
-    errors: {
-      name: submitted ? errors.name : "",
-      email: submitted ? errors.email : "",
-      password: submitted ? errors.password : "",
-      confirmPassword: submitted ? errors.confirmPassword : "",
-    },
-    loading: value.loading,
-    setName: (val) => {
-      setValue((prev) => ({ ...prev, userName: val }));
-      if (submitted) setErrors((prev) => ({ ...prev, name: "" }));
-    },
-    setEmail: (val) => {
-      setValue((prev) => ({ ...prev, userMail: val }));
-      if (submitted) setErrors((prev) => ({ ...prev, email: "" }));
-    },
-    setPassword: (val) => {
-      setValue((prev) => ({ ...prev, userPassword: val }));
-      if (submitted) setErrors((prev) => ({ ...prev, password: "", confirmPassword: "" }));
-    },
-    setConfirmPassword: (val) => {
-      setValue((prev) => ({ ...prev, confirmUserPassword: val }));
-      if (submitted) setErrors((prev) => ({ ...prev, confirmPassword: "" }));
-    },
-    handleSignup,
+    values,
+    setField,
+    errors: submitted ? errors : {},
+    loading,
     focusRef,
+    handleSignup,
     handleGoogleSignup: loginWithGoogle,
   };
 };

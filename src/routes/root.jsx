@@ -1,43 +1,21 @@
+// FirebaseActionRedirect.jsx
 import { useEffect } from "react";
-import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 function FirebaseActionRedirect() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { user, loading } = useAuth();
   const [searchParams] = useSearchParams();
+  const mode = searchParams.get("mode");
 
   useEffect(() => {
-    if (loading) return;
-
-    const mode = searchParams.get("mode");
-
     if (mode === "resetPassword") {
-      navigate("/resetpassword" + location.search, { replace: true });
+      navigate("/resetpassword" + window.location.search, { replace: true });
     } else if (mode === "verifyEmail") {
-      navigate("/verifyemail" + location.search, { replace: true });
-    } else if (user && user.emailVerified) {
-      if (location.pathname !== "/equilo/home") {
-        navigate("/equilo/home", { replace: true });
-      }
-    } else {
-      const publicPaths = [
-        "/login",
-        "/signup",
-        "/resetpassword",
-        "/verifyemail",
-      ];
-      if (!publicPaths.includes(location.pathname)) {
-        navigate("/login", { replace: true });
-      }
+      navigate("/verifyemail" + window.location.search, { replace: true });
     }
-  }, [searchParams, location, navigate, user, loading]);
-
-  if (loading) {
-    return null;
-  }
+  }, [mode, navigate]);
 
   return null;
 }
+
 export default FirebaseActionRedirect;
