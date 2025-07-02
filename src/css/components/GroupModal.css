@@ -58,14 +58,6 @@ input.invalid-email {
     background-color: rgba(255, 77, 79, 0.05);
 }
 
-.email-error,
-.error-text {
-    font-size: var(--font-size-sm);
-    color: #ff4d4f;
-    margin-top: 4px;
-    padding-left: 0.25rem;
-}
-
 .duplicate-border {
     border: 1px solid red !important;
     background-color: #fff0f0;
@@ -82,17 +74,23 @@ input.invalid-email {
 
 .member-input {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    /* align-items: center; */
+    /* justify-content: center; */
     gap: 10px;
     margin-top: 10px;
+    width: 100%;
+}
+
+.email-input{
+    display: flex;
+    align-items: center;
     position: relative;
 }
 
-.member-input input {
-    flex: 1;
-}
-
 .remove-btn {
+    position: absolute;
+    right: 2%;
     background: none;
     border: none;
     color: #ff4d4f;
@@ -103,6 +101,15 @@ input.invalid-email {
 
 .remove-btn:hover {
     transform: scale(1.2);
+}
+
+.email-error,
+.error-text {
+    display: block;
+    font-size: var(--font-size-sm);
+    color: #ff4d4f;
+    /* margin-top: 4px;
+    padding-left: 0.25rem; */
 }
 
 .add-more {
@@ -121,6 +128,8 @@ input.invalid-email {
 }
 
 .you-label {
+    position: absolute;
+    right: 2%;
     font-size: 0.7rem;
     background-color: var(--primary);
     color: #fff;

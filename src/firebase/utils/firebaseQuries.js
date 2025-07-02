@@ -181,10 +181,6 @@ export async function updateUserandGroupMemberStats(groupId, paymentData) {
     }
 }
 
-// export async function notifications() {
-
-// }
-
 export async function inviteNotifications(groupId, groupName, groupMembers, groupCreatedBy) {
     if (!groupId || !groupName || !groupMembers || !groupCreatedBy) return;
 
@@ -214,5 +210,3 @@ export async function inviteNotifications(groupId, groupName, groupMembers, grou
         return error;
     }
 }
-
-export async const 

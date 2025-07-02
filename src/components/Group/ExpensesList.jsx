@@ -26,7 +26,7 @@ const ExpensesList = ({ expenses, onSelect }) => {
                   onClick={() => onSelect(exp)}
                 >
                   <div className="expense-button-title">{exp.title}</div>
-                  <div className="expense-button-total-amount">Total RS. {exp.totalAmount?.toFixed(2)}</div>
+                  <div className="expense-button-total-amount">Total Rs. {exp.totalAmount?.toFixed(2)}</div>
                   <div className="expense-button-icon">{icon}</div>
                 </div>
               );
