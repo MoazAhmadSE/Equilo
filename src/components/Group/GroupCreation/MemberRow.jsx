@@ -21,7 +21,7 @@ const MemberRow = ({ member, contribution, onChange }) => {
 
       {c.role === "paid" && (
         <input
-          type="number"
+          type="text"
           placeholder="Amount Paid"
           value={c.amount}
           className="amount-input"

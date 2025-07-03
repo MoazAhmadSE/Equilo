@@ -367,10 +367,6 @@ select,
         align-items: flex-start;
     }
 
-    .amount-input {
-        width: 100%;
-    }
-
     .split-options {
         flex-direction: column;
     }

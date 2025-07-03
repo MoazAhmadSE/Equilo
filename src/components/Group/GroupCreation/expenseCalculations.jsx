@@ -1,60 +1,62 @@
+// Calculate equal shares for members marked as "paid" or "split"
 export const calculateShares = (totalAmount, contributions, members) => {
   const total = parseFloat(totalAmount || 0);
-  const splitters = contributions.filter(
-    (c) => c.role === "split" || c.role === "paid"
-  );
-  const equalShare = splitters.length > 0 ? total / splitters.length : 0;
 
-  return members.map((m) => {
-    const matched = splitters.find((s) => s.id === m.id);
-    return {
-      id: m.id,
-      name: m.name,
-      finalAmount: matched ? equalShare : 0,
-      note: matched ? "Included" : "Not Included",
-    };
-  });
+  const included = contributions.filter(
+    (c) => c.role === "paid" || c.role === "split"
+  );
+
+  const share = included.length ? total / included.length : 0;
+
+  return members.map((m) => ({
+    id: m.id,
+    name: m.name,
+    finalAmount: included.find((c) => c.id === m.id)
+      ? parseFloat(share.toFixed(2))
+      : 0,
+    note: included.find((c) => c.id === m.id) ? "Included" : "Not Included",
+  }));
 };
 
+// Determine who pays whom and how much
 export const calculateSettlementMatrix = (contributions, shares, members) => {
-  const paidContributors = contributions.filter((c) => c.role === "paid");
-  const parsedPayers = paidContributors.map((c) => ({
-    ...c,
-    paid: parseFloat(c.amount || 0),
-  }));
-  const payers = parsedPayers.filter((c) => c.paid > 0);
+  const paidMap = Object.fromEntries(
+    contributions
+      .filter((c) => c.role === "paid")
+      .map((c) => [c.id, parseFloat(c.amount || 0)])
+  );
 
   const balances = members.map((m) => {
-    const paid = payers.find((p) => p.id === m.id)?.paid || 0;
+    const paid = paidMap[m.id] || 0;
     const owed = shares.find((s) => s.id === m.id)?.finalAmount || 0;
-    return { id: m.id, name: m.name, net: paid - owed };
+    return { id: m.id, net: paid - owed };
   });
 
-  const debtors = balances.filter((b) => b.net < 0);
-  const creditors = balances.filter((b) => b.net > 0);
+  const debtors = balances
+    .filter((b) => b.net < -0.01)
+    .sort((a, b) => a.net - b.net);
+  const creditors = balances
+    .filter((b) => b.net > 0.01)
+    .sort((a, b) => b.net - a.net);
 
   const settlements = [];
-  let sortedDebtors = [...debtors].sort((a, b) => a.net - b.net);
-  let sortedCreditors = [...creditors].sort((a, b) => b.net - a.net);
 
-  for (let debtor of sortedDebtors) {
+  for (let debtor of debtors) {
     let debt = -debtor.net;
 
-    for (let creditor of sortedCreditors) {
-      if (debt === 0) break;
-      if (creditor.net === 0) continue; 
-      if (debtor.id === creditor.id) continue;
+    for (let creditor of creditors) {
+      if (debt <= 0) break;
+      if (creditor.net <= 0 || creditor.id === debtor.id) continue;
 
-      const payAmount = Math.min(debt, creditor.net);
-
+      const pay = Math.min(debt, creditor.net);
       settlements.push({
         from: debtor.id,
         to: creditor.id,
-        amount: payAmount,
+        amount: parseFloat(pay.toFixed(2)),
       });
 
-      debt -= payAmount;
-      creditor.net -= payAmount;
+      debt -= pay;
+      creditor.net -= pay;
     }
   }
 
@@ -62,20 +64,30 @@ export const calculateSettlementMatrix = (contributions, shares, members) => {
 };
 
 export const validateExpense = (desc, total, contributions, members) => {
-  if (!desc || !total || isNaN(total) || parseFloat(total) <= 0) {
+  const totalFloat = parseFloat(total);
+
+  if (!desc || isNaN(totalFloat) || totalFloat <= 0) {
     return "Please enter a valid description and total amount.";
   }
 
   for (const c of contributions) {
     if (c.role === "paid") {
-      const amount = parseFloat(c.amount);
-      if (isNaN(amount) || amount <= 0) {
-        const name = members.find((m) => m.id === c.id)?.name || c.id;
+      const amt = parseFloat(c.amount);
+      if (isNaN(amt) || amt <= 0) {
+        const name = members.find((m) => m.id === c.id)?.name || "Unknown";
         return `Invalid paid amount for ${name}`;
       }
     }
   }
 
+  const hasSplitter = contributions.some(
+    (c) => c.role === "split" || c.role === "paid"
+  );
+  if (!hasSplitter) {
+    return "At least one member must be included in the split.";
+  }
+
+  // ✅ Don't block if paid total doesn't match
   return null;
 };
 
